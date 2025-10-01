@@ -1,7 +1,104 @@
 {
-  "users": {},
-  "weeklyReports": {},
+  "users": {
+    "1304717444895473687": {
+      "username": "Pepito",
+      "activities": {
+        "2025-W40": {
+          "limpieza_espacios": 0,
+          "abastecimiento_electrico": 1,
+          "asesoramiento_empresarial": 1,
+          "jardineria": 0,
+          "mantenimiento_gasolineras": 0,
+          "limpieza_rascacielos": 0,
+          "history": [
+            {
+              "type": "asesoramiento_empresarial",
+              "timestamp": "2025-09-30T01:29:47.588Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1422241465089654895/1422394978927247492/image.png?ex=68dc840d&is=68db328d&hm=b3bcdf4cf756733d3ac39cc77d581bc66e847a181662505e7ef006624b77484e&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-09-30T01:31:21.281Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1422241465089654895/1422395372130533386/image.png?ex=68dc846b&is=68db32eb&hm=76cdd02cc5d5aae69da73432fa3eb18cccba9e5bf8f9b633534123a2914eeadb&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1422394987965972571"
+    },
+    "417479946177609729": {
+      "username": "Kylan Freizer",
+      "activities": {
+        "2025-W40": {
+          "limpieza_espacios": 0,
+          "abastecimiento_electrico": 0,
+          "asesoramiento_empresarial": 0,
+          "jardineria": 0,
+          "mantenimiento_gasolineras": 1,
+          "limpieza_rascacielos": 0,
+          "history": [
+            {
+              "type": "mantenimiento_gasolineras",
+              "timestamp": "2025-09-30T01:32:12.180Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1422241465089654895/1422395585658490971/image.png?ex=68dc849e&is=68db331e&hm=14b68593690b29988dc0cfcc3975b4b1f6df6e321c52994fbcef732f55667513&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1422395588216881263"
+    }
+  },
+  "weeklyReports": {
+    "2025-W40": {
+      "week": "2025-W40",
+      "totalUsers": 2,
+      "totalActivities": 3,
+      "activityStats": {
+        "limpieza_espacios": 0,
+        "abastecimiento_electrico": 1,
+        "asesoramiento_empresarial": 1,
+        "jardineria": 0,
+        "mantenimiento_gasolineras": 1,
+        "limpieza_rascacielos": 0
+      },
+      "userStats": [
+        {
+          "userId": "1304717444895473687",
+          "username": "Pepito",
+          "totalActivities": 2,
+          "activities": {
+            "limpieza_espacios": 0,
+            "abastecimiento_electrico": 1,
+            "asesoramiento_empresarial": 1,
+            "jardineria": 0,
+            "mantenimiento_gasolineras": 0,
+            "limpieza_rascacielos": 0
+          }
+        },
+        {
+          "userId": "417479946177609729",
+          "username": "Kylan Freizer",
+          "totalActivities": 1,
+          "activities": {
+            "limpieza_espacios": 0,
+            "abastecimiento_electrico": 1,
+            "asesoramiento_empresarial": 1,
+            "jardineria": 0,
+            "mantenimiento_gasolineras": 1,
+            "limpieza_rascacielos": 0
+          }
+        }
+      ],
+      "generatedAt": "2025-09-30T01:32:27.251Z"
+    }
+  },
   "currentWeek": "2025-W40",
   "pendingRegistrations": {},
-  "persistentMessageId": "1422255016651128969"
+  "persistentMessageId": "1422397175211753526"
 }

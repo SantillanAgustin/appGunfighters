@@ -141,7 +141,7 @@ async function createPersistentRegisterMessage() {
         const embed = new EmbedBuilder()
             .setColor(0x0099ff)
             .setTitle('🏗️ Sistema de Registro de Actividades - Gunfighters')
-            .setDescription('**¡Registra tus actividades aquí!**\n\n' +
+            .setDescription('**¡Registra tu servicio comunitario!**\n\n' +
                           '📋 **Actividades disponibles:**\n' +
                           '🧹 Limpieza de Espacios Públicos\n' +
                           '⚡ Restablecimiento Eléctrico\n' +
