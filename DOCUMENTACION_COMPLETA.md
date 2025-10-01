@@ -9,6 +9,7 @@
 - [Sistema de Hilos](#sistema-de-hilos)
 - [Sistema de Reportes Semanales](#sistema-de-reportes-semanales)
 - [Sistema de Mensajes Persistentes](#sistema-de-mensajes-persistentes)
+- [Sistema de Recordatorios Automáticos](#sistema-de-recordatorios-automáticos)
 - [Base de Datos](#base-de-datos)
 - [Instalación y Uso](#instalación-y-uso)
 - [Desarrollo](#desarrollo)
@@ -22,7 +23,8 @@ Gunfighters Bot es un sistema automatizado diseñado específicamente para la or
 - 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene su propio hilo para un seguimiento detallado
 - 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas
 - ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC
-- 💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
+- � **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
+- �💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
 - 🔒 **Control de Permisos**: Diferentes niveles de acceso según roles de Discord
 - 📸 **Validación por Fotos**: Sistema de verificación mediante imágenes
 - 🎯 **Actividades Específicas**: 6 tipos diferentes de trabajos de Gunfighters
@@ -36,12 +38,14 @@ appGunfighters/
 │   ├── index.js                 # Archivo principal del bot
 │   └── utils/
 │       ├── activityManager.js   # Gestión de actividades y datos
-│       └── reportFormatter.js   # Formateo de reportes
+│       ├── reportFormatter.js   # Formateo de reportes
+│       └── scheduleManager.js   # Sistema de recordatorios automáticos
 ├── data/
 │   ├── activities.json          # Registro de todas las actividades
 │   ├── weeklyReports.json       # Reportes semanales generados
 │   ├── threads.json             # Mapeo de usuarios a hilos
-│   └── persistentMessages.json  # IDs de mensajes persistentes
+│   ├── persistentMessages.json  # IDs de mensajes persistentes
+│   └── scheduledActivities.json # Actividades programadas del sistema
 ├── .env                         # Variables de entorno
 ├── package.json                 # Dependencias del proyecto
 ├── README.md                    # Documentación básica
@@ -122,6 +126,26 @@ Crea un mensaje persistente de registro en el canal configurado.
 - **Descripción**: Genera el mensaje persistente con botones de actividades
 - **Permisos**: Gestionar Mensajes
 - **Nota**: Se verifica automáticamente cada 5 minutos
+
+#### `!listar-actividades`
+Muestra todas las actividades programadas del sistema.
+- **Uso**: `!listar-actividades`
+- **Descripción**: Lista actividades con horarios, días y estado
+- **Permisos**: Gestionar Mensajes
+
+#### `!agregar-actividad`
+Agregar nueva actividad programada con recordatorio.
+- **Uso**: `!agregar-actividad "Nombre" "HH:MM" "días" "descripción"`
+- **Descripción**: Crea actividad con recordatorio automático
+- **Permisos**: Gestionar Mensajes
+- **Ejemplo**: `!agregar-actividad "Evento Especial" "15:30" "1,3,5" "Evento semanal"`
+
+#### `!recordatorios`
+Panel de gestión del sistema de recordatorios.
+- **Uso**: `!recordatorios [subcomando] [parámetros]`
+- **Subcomandos**: `eliminar [ID]`, `toggle [ID]`
+- **Descripción**: Gestión completa de recordatorios automáticos
+- **Permisos**: Gestionar Mensajes
 
 #### `!limpiar-todo`
 Elimina todos los datos y hilos del sistema.
@@ -250,6 +274,75 @@ El mensaje persistente contiene:
 - **Botones interactivos**: Uno para cada tipo de actividad
 - **Formato profesional**: Embeds con colores y emojis
 
+## ⏰ Sistema de Recordatorios Automáticos
+
+### 🎯 Funcionalidad Principal
+
+El sistema de recordatorios monitorea automáticamente las actividades del sistema del juego GTA V y envía notificaciones 10 minutos antes de cada una para mantener a la organización informada sobre las oportunidades de participación.
+
+### 📋 Actividades del Sistema Configuradas
+
+#### 🧹 **Limpieza de Espacios Públicos** (4 horarios diarios)
+- **00:00-01:00 UTC** (recordatorio: 23:50)
+- **06:00-07:00 UTC** (recordatorio: 05:50)
+- **12:00-13:00 UTC** (recordatorio: 11:50)
+- **21:00-22:00 UTC** (recordatorio: 20:50)
+
+#### ⚡ **Restablecimiento Eléctrico** (4 horarios diarios)
+- **03:00-04:00 UTC** (recordatorio: 02:50)
+- **15:00-16:00 UTC** (recordatorio: 14:50)
+- **18:00-19:00 UTC** (recordatorio: 17:50)
+- **20:00-21:00 UTC** (recordatorio: 19:50)
+
+#### 💼 **Asesoramiento Empresarial** (3 horarios diarios)
+- **01:00-02:00 UTC** (recordatorio: 00:50)
+- **10:00-11:00 UTC** (recordatorio: 09:50)
+- **13:00-14:00 UTC** (recordatorio: 12:50)
+
+#### 🌱 **Servicio de Jardinería** (2 horarios diarios)
+- **04:00-05:00 UTC** (recordatorio: 03:50)
+- **22:00-23:00 UTC** (recordatorio: 21:50)
+
+#### ⛽ **Mantenimiento de Gasolineras** (3 horarios diarios)
+- **02:00-03:00 UTC** (recordatorio: 01:50)
+- **08:00-09:00 UTC** (recordatorio: 07:50)
+- **16:00-17:00 UTC** (recordatorio: 15:50)
+
+#### 🏢 **Limpieza de Rascacielos** (2 horarios diarios)
+- **09:00-10:00 UTC** (recordatorio: 08:50)
+- **19:00-20:00 UTC** (recordatorio: 18:50)
+
+### 🔧 Sistema de Verificación
+
+- **Frecuencia**: Cada minuto
+- **Detección inteligente**: Solo envía recordatorios cuando es el momento exacto
+- **Prevención de duplicados**: Una sola notificación por día por actividad
+- **Configuración flexible**: Actividades pueden activarse/desactivarse individualmente
+
+### 📱 Formato de Notificación
+
+Cada recordatorio incluye:
+- **Título llamativo**: "⏰ Recordatorio de Actividad - HORA HUB"
+- **Información específica**: Nombre de la actividad y tiempo restante
+- **Hora exacta**: Cuándo inicia la actividad en UTC
+- **Descripción**: Detalles del rango horario
+- **Mención automática**: Al rol supervisor si está configurado
+
+### 🛠️ Gestión de Actividades
+
+Las actividades pueden gestionarse mediante comandos:
+- **Listar**: Ver todas las actividades programadas
+- **Agregar**: Crear nuevas actividades personalizadas
+- **Activar/Desactivar**: Controlar qué recordatorios se envían
+- **Eliminar**: Remover actividades obsoletas
+
+### 📊 Estadísticas del Sistema
+
+- **Total diario**: 18 recordatorios automáticos
+- **Cobertura**: 24 horas del día, 7 días de la semana
+- **Precisión**: Notificaciones exactas 10 minutos antes
+- **Eficiencia**: Sistema optimizado sin spam ni duplicados
+
 ## 🗃️ Base de Datos
 
 ### 📄 activities.json
@@ -303,6 +396,25 @@ Almacena IDs de mensajes persistentes por canal:
 }
 ```
 
+### 📄 scheduledActivities.json
+Almacena las actividades programadas del sistema con sus recordatorios:
+```json
+[
+  {
+    "id": "limpieza_espacios_00",
+    "name": "🧹 Limpieza de Espacios Públicos #1",
+    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 00-01hs UTC)",
+    "timeUTC": "00:00",
+    "daysOfWeek": [0, 1, 2, 3, 4, 5, 6],
+    "reminderSent": {
+      "2024-09-30": true
+    },
+    "active": true,
+    "createdAt": "2024-09-30T15:00:00.000Z"
+  }
+]
+```
+
 ## 🚀 Instalación y Uso
 
 ### 📋 Prerrequisitos
@@ -344,6 +456,7 @@ El bot necesita los siguientes permisos en Discord:
 - **index.js**: Controlador principal y manejo de eventos
 - **activityManager.js**: Lógica de datos y persistencia
 - **reportFormatter.js**: Formateo de reportes y embeds
+- **scheduleManager.js**: Sistema de recordatorios automáticos y gestión de actividades programadas
 
 ### 🔍 Debugging
 
@@ -363,6 +476,8 @@ Para añadir nuevas actividades:
 - **Comando de configuración**: `!config` para verificar setup
 - **Reportes manuales**: `!informe` para testing
 - **Mensaje persistente**: `!crear-mensaje` para verificar funcionalidad
+- **Sistema de recordatorios**: `!listar-actividades` para verificar actividades programadas
+- **Gestión de recordatorios**: `!recordatorios` para testing del sistema de notificaciones
 
 ---
 
@@ -377,4 +492,4 @@ Para problemas técnicos o consultas sobre el bot, revisar:
 ---
 
 **Última actualización**: Septiembre 2025  
-**Versión**: 2.0 - Sistema completo con reportes automáticos y mensajes persistentes
+**Versión**: 3.0 - Sistema completo con reportes automáticos, mensajes persistentes y recordatorios de actividades del sistema
