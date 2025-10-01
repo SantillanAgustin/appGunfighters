@@ -21,6 +21,17 @@ const {
 
 const { formatWeeklyReport } = require('./utils/reportFormatter');
 
+// Importar el nuevo módulo de recordatorios
+const {
+    addScheduledActivity,
+    getActivitiesForReminder,
+    markReminderAsSent,
+    removeScheduledActivity,
+    getAllScheduledActivities,
+    toggleActivityStatus,
+    getDayNames
+} = require('./utils/scheduleManager');
+
 // Crear el cliente del bot
 const client = new Client({
     intents: [
@@ -38,6 +49,9 @@ setInterval(checkAndGenerateWeeklyReport, 60000);
 
 // Verificar mensaje persistente cada 5 minutos
 setInterval(checkPersistentMessage, 300000);
+
+// Verificar recordatorios de actividades programadas cada minuto
+setInterval(checkScheduledReminders, 60000);
 
 /**
  * Verificar si es momento de generar el informe semanal
@@ -284,6 +298,81 @@ async function checkPersistentMessage() {
 }
 
 /**
+ * Verificar y enviar recordatorios de actividades programadas
+ */
+async function checkScheduledReminders() {
+    try {
+        if (!process.env.REMINDERS_CHANNEL_ID) return;
+
+        const activitiesForReminder = getActivitiesForReminder();
+        
+        if (activitiesForReminder.length === 0) return;
+
+        const guild = client.guilds.cache.get(process.env.GUILD_ID);
+        if (!guild) {
+            console.error('❌ No se pudo encontrar el servidor para recordatorios');
+            return;
+        }
+
+        const reminderChannel = guild.channels.cache.get(process.env.REMINDERS_CHANNEL_ID);
+        if (!reminderChannel) {
+            console.error('❌ No se pudo encontrar el canal de recordatorios');
+            return;
+        }
+
+        for (const activity of activitiesForReminder) {
+            console.log(`⏰ Enviando recordatorio para: ${activity.name}`);
+            
+            const embed = new EmbedBuilder()
+                .setColor(0xff6b35)
+                .setTitle('⏰ Recordatorio de Actividad - HORA HUB')
+                .setDescription(`**${activity.name}** comenzará en **10 minutos**`)
+                .addFields([
+                    {
+                        name: '🕐 Hora de inicio (UTC)',
+                        value: `${activity.activityTime}`,
+                        inline: true
+                    },
+                    {
+                        name: '📅 Tipo de evento',
+                        value: 'Actividad del Sistema',
+                        inline: true
+                    }
+                ])
+                .setFooter({ text: 'Gunfighters - Sistema de Recordatorios' })
+                .setTimestamp();
+
+            if (activity.description) {
+                embed.addFields([
+                    {
+                        name: '📝 Descripción',
+                        value: activity.description,
+                        inline: false
+                    }
+                ]);
+            }
+
+            // Mencionar al rol supervisor si está configurado
+            let content = '🔔 **RECORDATORIO DE ACTIVIDAD**';
+            if (process.env.SUPERVISOR_ROLE_ID) {
+                content += `\n<@&${process.env.SUPERVISOR_ROLE_ID}>`;
+            }
+
+            await reminderChannel.send({
+                content: content,
+                embeds: [embed]
+            });
+
+            // Marcar recordatorio como enviado
+            markReminderAsSent(activity.id);
+        }
+
+    } catch (error) {
+        console.error('❌ Error enviando recordatorios:', error);
+    }
+}
+
+/**
  * Crear o obtener hilo para un usuario
  */
 async function getOrCreateUserThread(member, originalChannel) {
@@ -492,10 +581,18 @@ client.on('messageCreate', async message => {
     // Comando help básico
     if (command === 'help') {
         const isAdmin = message.member.permissions.has(PermissionFlagsBits.Administrator);
-        let commands = '`!help`, `!registro`, `!config`, `!informe`, `!crear-mensaje`';
+        const canManageMessages = message.member.permissions.has(PermissionFlagsBits.ManageMessages);
+        
+        let commands = '`!help`, `!registro`';
+        
+        if (canManageMessages) {
+            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`';
+        }
+        
         if (isAdmin) {
             commands += ', `!limpiar-todo` (admin)';
         }
+        
         message.reply('Comandos disponibles: ' + commands);
     }
 
@@ -790,6 +887,251 @@ client.on('messageCreate', async message => {
             console.error('❌ Error creando mensaje persistente:', error);
             await message.reply('❌ Error al crear el mensaje persistente. Revisa la configuración del bot.');
         }
+    }
+
+    // Comando para listar actividades programadas
+    if (command === 'listar-actividades') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        try {
+            const activities = getAllScheduledActivities();
+            
+            if (activities.length === 0) {
+                const embed = new EmbedBuilder()
+                    .setColor(0xffa500)
+                    .setTitle('⏰ Actividades Programadas')
+                    .setDescription('No hay actividades programadas actualmente.')
+                    .addFields([
+                        {
+                            name: '📝 Para agregar una actividad:',
+                            value: 'Usa el comando `!agregar-actividad`',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+                
+                return message.reply({ embeds: [embed] });
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor(0x3498db)
+                .setTitle('⏰ Actividades Programadas')
+                .setDescription(`Se encontraron **${activities.length}** actividades programadas:`)
+                .setTimestamp();
+
+            for (const activity of activities) {
+                const status = activity.active ? '✅ Activa' : '❌ Desactivada';
+                const days = getDayNames(activity.daysOfWeek);
+                
+                embed.addFields([
+                    {
+                        name: `${activity.name} (ID: ${activity.id})`,
+                        value: `**Estado:** ${status}\n**Hora UTC:** ${activity.timeUTC}\n**Días:** ${days}\n**Descripción:** ${activity.description || 'Sin descripción'}`,
+                        inline: false
+                    }
+                ]);
+            }
+
+            message.reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Error listando actividades:', error);
+            message.reply('❌ Error al listar las actividades programadas.');
+        }
+    }
+
+    // Comando para agregar nueva actividad programada
+    if (command === 'agregar-actividad') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        const args = message.content.split(' ').slice(1).join(' ');
+        if (!args) {
+            const embed = new EmbedBuilder()
+                .setColor(0xffa500)
+                .setTitle('⏰ Agregar Actividad Programada')
+                .setDescription('**Uso del comando:**')
+                .addFields([
+                    {
+                        name: '📝 Formato:',
+                        value: '`!agregar-actividad "Nombre" "HH:MM" "días" "descripción"`',
+                        inline: false
+                    },
+                    {
+                        name: '📅 Días de la semana:',
+                        value: '0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado\nEjemplo: "1,2,3,4,5" para lunes a viernes',
+                        inline: false
+                    },
+                    {
+                        name: '⏰ Ejemplo:',
+                        value: '`!agregar-actividad "Limpieza de calles" "14:30" "1,3,5" "Actividad de limpieza semanal"`',
+                        inline: false
+                    }
+                ])
+                .setTimestamp();
+            
+            return message.reply({ embeds: [embed] });
+        }
+
+        try {
+            // Parsing manual de argumentos con comillas
+            const parts = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < args.length; i++) {
+                const char = args[i];
+                if (char === '"') {
+                    if (inQuotes) {
+                        parts.push(current);
+                        current = '';
+                        inQuotes = false;
+                    } else {
+                        inQuotes = true;
+                    }
+                } else if (char === ' ' && !inQuotes) {
+                    if (current.length > 0) {
+                        parts.push(current);
+                        current = '';
+                    }
+                } else {
+                    current += char;
+                }
+            }
+            
+            if (current.length > 0) {
+                parts.push(current);
+            }
+
+            if (parts.length < 3) {
+                return message.reply('❌ Formato incorrecto. Usa: `!agregar-actividad "Nombre" "HH:MM" "días" "descripción"`');
+            }
+
+            const [name, timeUTC, daysStr, description = ''] = parts;
+
+            // Validar formato de hora
+            if (!/^\d{2}:\d{2}$/.test(timeUTC)) {
+                return message.reply('❌ Formato de hora incorrecto. Usa HH:MM (ej: 14:30)');
+            }
+
+            // Validar y parsear días
+            const daysArray = daysStr.split(',').map(d => parseInt(d.trim())).filter(d => d >= 0 && d <= 6);
+            if (daysArray.length === 0) {
+                return message.reply('❌ Días inválidos. Usa números del 0-6 separados por comas (ej: 1,2,3,4,5)');
+            }
+
+            const activityData = {
+                name,
+                timeUTC,
+                daysOfWeek: daysArray,
+                description
+            };
+
+            const newActivity = addScheduledActivity(activityData);
+            
+            if (newActivity) {
+                const embed = new EmbedBuilder()
+                    .setColor(0x00ff00)
+                    .setTitle('✅ Actividad Agregada')
+                    .setDescription(`La actividad **${name}** ha sido programada exitosamente.`)
+                    .addFields([
+                        {
+                            name: '🆔 ID',
+                            value: newActivity.id,
+                            inline: true
+                        },
+                        {
+                            name: '⏰ Hora UTC',
+                            value: timeUTC,
+                            inline: true
+                        },
+                        {
+                            name: '📅 Días',
+                            value: getDayNames(daysArray),
+                            inline: false
+                        },
+                        {
+                            name: '📝 Descripción',
+                            value: description || 'Sin descripción',
+                            inline: false
+                        }
+                    ])
+                    .setFooter({ text: 'Los recordatorios se enviarán 10 minutos antes' })
+                    .setTimestamp();
+
+                message.reply({ embeds: [embed] });
+            } else {
+                message.reply('❌ Error al agregar la actividad. Inténtalo de nuevo.');
+            }
+
+        } catch (error) {
+            console.error('❌ Error agregando actividad:', error);
+            message.reply('❌ Error al procesar el comando. Verifica el formato.');
+        }
+    }
+
+    // Comando para mostrar/gestionar recordatorios
+    if (command === 'recordatorios') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        const subcommand = message.content.split(' ')[1];
+
+        if (subcommand === 'eliminar') {
+            const activityId = message.content.split(' ')[2];
+            if (!activityId) {
+                return message.reply('❌ Uso: `!recordatorios eliminar [ID_ACTIVIDAD]`');
+            }
+
+            if (removeScheduledActivity(activityId)) {
+                message.reply('✅ Actividad eliminada exitosamente.');
+            } else {
+                message.reply('❌ No se encontró la actividad con ese ID.');
+            }
+            return;
+        }
+
+        if (subcommand === 'toggle') {
+            const activityId = message.content.split(' ')[2];
+            if (!activityId) {
+                return message.reply('❌ Uso: `!recordatorios toggle [ID_ACTIVIDAD]`');
+            }
+
+            const updatedActivity = toggleActivityStatus(activityId);
+            if (updatedActivity) {
+                const status = updatedActivity.active ? 'activada' : 'desactivada';
+                message.reply(`✅ Actividad **${updatedActivity.name}** ${status}.`);
+            } else {
+                message.reply('❌ No se encontró la actividad con ese ID.');
+            }
+            return;
+        }
+
+        // Mostrar información general
+        const embed = new EmbedBuilder()
+            .setColor(0x3498db)
+            .setTitle('⏰ Sistema de Recordatorios')
+            .setDescription('Gestión de actividades programadas con recordatorios automáticos.')
+            .addFields([
+                {
+                    name: '📋 Comandos disponibles:',
+                    value: '`!listar-actividades` - Ver todas las actividades\n`!agregar-actividad` - Agregar nueva actividad\n`!recordatorios eliminar [ID]` - Eliminar actividad\n`!recordatorios toggle [ID]` - Activar/desactivar',
+                    inline: false
+                },
+                {
+                    name: '⚙️ Configuración:',
+                    value: `**Canal de recordatorios:** ${process.env.REMINDERS_CHANNEL_ID ? `<#${process.env.REMINDERS_CHANNEL_ID}>` : 'No configurado'}\n**Tiempo de aviso:** 10 minutos antes\n**Verificación:** Cada minuto`,
+                    inline: false
+                }
+            ])
+            .setFooter({ text: 'Gunfighters - Sistema de Recordatorios' })
+            .setTimestamp();
+
+        message.reply({ embeds: [embed] });
     }
 
 

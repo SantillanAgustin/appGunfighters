@@ -1,0 +1,42 @@
+[
+  {
+    "id": "limpieza_espacios_00",
+    "name": "🧹 Limpieza de Espacios Públicos #1",
+    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 00-01hs UTC)",
+    "timeUTC": "00:00",
+    "daysOfWeek": [0, 1, 2, 3, 4, 5, 6],
+    "reminderSent": {},
+    "active": true,
+    "createdAt": "2024-09-30T15:00:00.000Z"
+  },
+  {
+    "id": "limpieza_espacios_06",
+    "name": "🧹 Limpieza de Espacios Públicos #2",
+    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 06-07hs UTC)",
+    "timeUTC": "06:00",
+    "daysOfWeek": [0, 1, 2, 3, 4, 5, 6],
+    "reminderSent": {},
+    "active": true,
+    "createdAt": "2024-09-30T15:01:00.000Z"
+  },
+  {
+    "id": "limpieza_espacios_12",
+    "name": "🧹 Limpieza de Espacios Públicos #3",
+    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 12-13hs UTC)",
+    "timeUTC": "12:00",
+    "daysOfWeek": [0, 1, 2, 3, 4, 5, 6],
+    "reminderSent": {},
+    "active": true,
+    "createdAt": "2024-09-30T15:02:00.000Z"
+  },
+  {
+    "id": "limpieza_espacios_21",
+    "name": "🧹 Limpieza de Espacios Públicos #4",
+    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 21-22hs UTC)",
+    "timeUTC": "21:00",
+    "daysOfWeek": [0, 1, 2, 3, 4, 5, 6],
+    "reminderSent": {},
+    "active": true,
+    "createdAt": "2024-09-30T15:03:00.000Z"
+  }
+]
