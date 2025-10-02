@@ -1,5 +1,29 @@
 {
-  "users": {},
+  "users": {
+    "1304717444895473687": {
+      "username": "Pepito",
+      "activities": {
+        "2025-W40": {
+          "limpieza_espacios": 1,
+          "abastecimiento_electrico": 0,
+          "asesoramiento_empresarial": 0,
+          "jardineria": 0,
+          "mantenimiento_gasolineras": 0,
+          "limpieza_rascacielos": 0,
+          "history": [
+            {
+              "type": "limpieza_espacios",
+              "timestamp": "2025-10-02T14:50:27.511Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1422241465089654895/1423321266470785207/image.png?ex=68dfe2b9&is=68de9139&hm=ddb6edbb842a053f7380114343df1d656f5136b499bf531f5170c1a682309ea1&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1423321270056915027"
+    }
+  },
   "weeklyReports": {},
   "currentWeek": "2025-W40",
   "pendingRegistrations": {},

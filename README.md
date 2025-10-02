@@ -61,6 +61,8 @@ npm start
 ### 👤 Usuarios
 - `!registro` - Mostrar formulario de registro de actividades
 - `!help` - Lista de comandos disponibles
+- `!balance` - Consultar balance semanal personal
+- `!aportar [monto] [descripción]` - Registrar aporte con screenshot
 
 ### 🔧 Administradores
 - `!config` - Verificar configuración del bot
@@ -69,6 +71,8 @@ npm start
 - `!listar-actividades` - Ver actividades programadas del sistema
 - `!agregar-actividad` - Agregar nueva actividad con recordatorio
 - `!recordatorios` - Panel de gestión de recordatorios automáticos
+- `!balances` - Ver resumen de todos los balances semanales
+- `!estadisticas-balance` - Estadísticas detalladas del sistema de balances
 - `!limpiar-todo` - Limpiar todos los datos (IRREVERSIBLE)
 
 ## 📋 Cómo Usar
@@ -96,13 +100,15 @@ appGunfighters/
 │   └── utils/
 │       ├── activityManager.js   # Gestión de datos
 │       ├── reportFormatter.js   # Formateo de reportes
-│       └── scheduleManager.js   # Sistema de recordatorios
+│       ├── scheduleManager.js   # Sistema de recordatorios
+│       └── balanceManager.js    # Sistema de balances (Nuevo)
 ├── data/
 │   ├── activities.json          # Base de datos actividades
 │   ├── weeklyReports.json       # Reportes semanales
 │   ├── threads.json             # Mapeo usuario-hilo
 │   ├── persistentMessages.json  # IDs mensajes persistentes
-│   └── scheduledActivities.json # Actividades programadas
+│   ├── scheduledActivities.json # Actividades programadas
+│   └── balances.json            # Sistema de balances (Nuevo)
 └── .env                         # Configuración
 ```
 
@@ -181,6 +187,53 @@ El bot monitorea automáticamente las actividades del sistema del juego GTA V y 
 !recordatorios eliminar [ID]      # Eliminar actividad
 ```
 
+## 💰 Sistema de Balances Semanales
+
+### 🎯 Funcionamiento del Sistema
+Cada miembro de Gunfighters tiene un **balance semanal de $50,000** que debe completar:
+
+- 🎮 **Trabajos externos**: Los miembros realizan trabajos fuera de la organización (restaurantes, empresas, etc.)
+- 💵 **Aporte obligatorio**: El 50% de las ganancias debe ir a la organización
+- 📊 **Cuota semanal**: Al aportar $50,000, el balance queda en $0 (cuota completada)
+- 🔄 **Reset automático**: Cada domingo a las 23:59 UTC se reinician los balances
+
+### 🔧 Comandos del Sistema
+
+#### Para Miembros:
+```bash
+!balance                          # Ver tu balance personal
+!aportar [monto] [descripción]    # Registrar aporte (requiere screenshot)
+```
+
+#### Para Administradores:
+```bash
+!balances                         # Resumen de todos los balances
+!estadisticas-balance             # Estadísticas detalladas semanales
+```
+
+### 📝 Ejemplo de Uso
+
+```bash
+# Un miembro trabaja en un restaurante y gana $10,000
+!aportar 10000 Trabajo en restaurante La Mesa
+
+# El sistema automáticamente:
+# - Descuenta $5,000 del balance ($45,000 restantes)
+# - Registra $5,000 para la organización
+# - $5,000 quedan para el miembro
+```
+
+### 📊 Funcionalidades
+
+- ✅ **Registro con evidencia**: Cada aporte requiere screenshot
+- 📈 **Estadísticas automáticas**: Seguimiento de contribuciones semanales
+- 🏆 **Rankings**: Top contribuyentes de la semana
+- 🔔 **Notificaciones**: Recordatorios automáticos de reset semanal
+- 💾 **Persistencia**: Todos los datos se almacenan permanentemente
+
+!recordatorios eliminar [ID]      # Eliminar actividad
+```
+
 ## 🔒 Permisos Necesarios
 
 El bot requiere estos permisos en Discord:
@@ -233,8 +286,8 @@ El bot requiere estos permisos en Discord:
 ---
 
 **Estado**: ✅ Funcionando completamente  
-**Última actualización**: Septiembre 2025  
-**Versión**: 3.0 - Sistema completo con reportes automáticos, mensajes persistentes y recordatorios de actividades del sistema
+**Última actualización**: Diciembre 2024  
+**Versión**: 4.0 - Sistema completo con reportes automáticos, mensajes persistentes, recordatorios de actividades del sistema y balance semanal de cuotas
 
 ---
 

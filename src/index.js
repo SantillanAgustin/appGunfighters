@@ -32,6 +32,20 @@ const {
     getDayNames
 } = require('./utils/scheduleManager');
 
+// Importar el módulo de gestión de balances
+const {
+    getUserBalance,
+    registerContribution,
+    getWeeklyStats,
+    getAllUserBalances,
+    resetWeeklyBalances,
+    shouldResetWeeklyBalances,
+    getCurrentWeekKey,
+    updateSettings,
+    getSettings,
+    formatMoney
+} = require('./utils/balanceManager');
+
 // Crear el cliente del bot
 const client = new Client({
     intents: [
@@ -52,6 +66,9 @@ setInterval(checkPersistentMessage, 300000);
 
 // Verificar recordatorios de actividades programadas cada minuto
 setInterval(checkScheduledReminders, 60000);
+
+// Verificar reset de balances semanales cada minuto
+setInterval(checkWeeklyBalanceReset, 60000);
 
 /**
  * Verificar si es momento de generar el informe semanal
@@ -373,6 +390,61 @@ async function checkScheduledReminders() {
 }
 
 /**
+ * Verificar y resetear balances semanales si es necesario
+ */
+async function checkWeeklyBalanceReset() {
+    try {
+        if (shouldResetWeeklyBalances()) {
+            console.log('⏰ Es momento de resetear los balances semanales...');
+            
+            if (resetWeeklyBalances()) {
+                console.log('✅ Balances semanales reseteados exitosamente');
+                
+                // Opcional: Enviar notificación al canal de recordatorios
+                if (process.env.REMINDERS_CHANNEL_ID) {
+                    const guild = client.guilds.cache.get(process.env.GUILD_ID);
+                    if (guild) {
+                        const reminderChannel = guild.channels.cache.get(process.env.REMINDERS_CHANNEL_ID);
+                        if (reminderChannel) {
+                            const embed = new EmbedBuilder()
+                                .setColor(0x00ff00)
+                                .setTitle('💰 Nueva Semana - Balances Reseteados')
+                                .setDescription('Los balances semanales han sido reseteados. Todos los miembros activos comienzan con $50,000 de cuota semanal.')
+                                .addFields([
+                                    {
+                                        name: '📅 Semana',
+                                        value: getCurrentWeekKey(),
+                                        inline: true
+                                    },
+                                    {
+                                        name: '💵 Balance Inicial',
+                                        value: formatMoney(50000),
+                                        inline: true
+                                    },
+                                    {
+                                        name: '🎯 Objetivo',
+                                        value: 'Llegar a $0 mediante aportes',
+                                        inline: true
+                                    }
+                                ])
+                                .setFooter({ text: 'Gunfighters - Sistema de Balances' })
+                                .setTimestamp();
+
+                            await reminderChannel.send({
+                                content: process.env.SUPERVISOR_ROLE_ID ? `<@&${process.env.SUPERVISOR_ROLE_ID}>` : '',
+                                embeds: [embed]
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error verificando reset de balances:', error);
+    }
+}
+
+/**
  * Crear o obtener hilo para un usuario
  */
 async function getOrCreateUserThread(member, originalChannel) {
@@ -583,10 +655,10 @@ client.on('messageCreate', async message => {
         const isAdmin = message.member.permissions.has(PermissionFlagsBits.Administrator);
         const canManageMessages = message.member.permissions.has(PermissionFlagsBits.ManageMessages);
         
-        let commands = '`!help`, `!registro`';
+        let commands = '`!help`, `!registro`, `!balance`, `!aportar`';
         
         if (canManageMessages) {
-            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`';
+            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`, `!balances`, `!estadisticas-balance`';
         }
         
         if (isAdmin) {
@@ -1132,6 +1204,370 @@ client.on('messageCreate', async message => {
             .setTimestamp();
 
         message.reply({ embeds: [embed] });
+    }
+
+    // Comando para ver balance personal
+    if (command === 'balance') {
+        try {
+            const userBalance = getUserBalance(message.author.id);
+            const currentWeek = getCurrentWeekKey();
+            const weeklyContributions = userBalance.weeklyContributions[currentWeek] || [];
+            const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
+            const settings = getSettings();
+            
+            const embed = new EmbedBuilder()
+                .setColor(userBalance.currentBalance === 0 ? 0x00ff00 : userBalance.currentBalance < 25000 ? 0xffa500 : 0xff0000)
+                .setTitle('💰 Tu Balance Semanal')
+                .setDescription(`**${message.member.displayName || message.author.username}**\n\nSemana: ${currentWeek}`)
+                .addFields([
+                    {
+                        name: '💵 Balance Restante',
+                        value: formatMoney(userBalance.currentBalance),
+                        inline: true
+                    },
+                    {
+                        name: '📊 Aportado Esta Semana',
+                        value: formatMoney(weeklyTotal),
+                        inline: true
+                    },
+                    {
+                        name: '🎯 Estado de Cuota',
+                        value: userBalance.currentBalance === 0 ? '✅ Completada' : '⏳ Pendiente',
+                        inline: true
+                    },
+                    {
+                        name: '📋 Contribuciones',
+                        value: `${weeklyContributions.length} encargos realizados`,
+                        inline: true
+                    },
+                    {
+                        name: '⚙️ Configuración',
+                        value: `${settings.organizationPercentage}% para la organización`,
+                        inline: true
+                    },
+                    {
+                        name: '💡 Información',
+                        value: 'Usa `!aportar` para registrar un nuevo encargo',
+                        inline: true
+                    }
+                ])
+                .setFooter({ text: 'Los balances se resetean cada domingo a las 23:59 UTC' })
+                .setTimestamp();
+
+            if (weeklyContributions.length > 0) {
+                const recentContributions = weeklyContributions.slice(-3).map((contrib, index) => {
+                    const date = new Date(contrib.timestamp).toLocaleDateString('es-ES');
+                    return `**${contrib.description}**: ${formatMoney(contrib.totalAmount)} (Aporte: ${formatMoney(contrib.organizationAmount)}) - ${date}`;
+                }).join('\n');
+                
+                embed.addFields([
+                    {
+                        name: '📝 Contribuciones Recientes',
+                        value: recentContributions,
+                        inline: false
+                    }
+                ]);
+            }
+
+            message.reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Error consultando balance:', error);
+            message.reply('❌ Error al consultar tu balance.');
+        }
+    }
+
+    // Comando para registrar aporte
+    if (command === 'aportar') {
+        try {
+            // Verificar si hay adjuntos (screenshots)
+            if (message.attachments.size === 0) {
+                const embed = new EmbedBuilder()
+                    .setColor(0xffa500)
+                    .setTitle('📸 Registro de Aporte')
+                    .setDescription('**Para registrar un aporte necesitas:**')
+                    .addFields([
+                        {
+                            name: '📝 Formato del comando:',
+                            value: '`!aportar [monto] [descripción]`',
+                            inline: false
+                        },
+                        {
+                            name: '📸 Screenshot requerido:',
+                            value: 'Adjunta una imagen del trabajo realizado y el pago recibido',
+                            inline: false
+                        },
+                        {
+                            name: '💰 Ejemplo:',
+                            value: '`!aportar 10000 Abastecimiento restaurante La Cocina`',
+                            inline: false
+                        },
+                        {
+                            name: '⚙️ Sistema:',
+                            value: 'El 50% del monto se descontará automáticamente de tu balance semanal',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+                
+                return message.reply({ embeds: [embed] });
+            }
+
+            const args = message.content.split(' ').slice(1);
+            if (args.length < 2) {
+                return message.reply('❌ Formato incorrecto. Usa: `!aportar [monto] [descripción]`');
+            }
+
+            const amount = parseInt(args[0]);
+            if (isNaN(amount) || amount <= 0) {
+                return message.reply('❌ El monto debe ser un número válido mayor a 0.');
+            }
+
+            const description = args.slice(1).join(' ');
+            if (description.length < 5) {
+                return message.reply('❌ La descripción debe tener al menos 5 caracteres.');
+            }
+
+            // Obtener URL de la primera imagen
+            const photoUrl = message.attachments.first().url;
+            const settings = getSettings();
+            const organizationAmount = Math.floor(amount * (settings.organizationPercentage / 100));
+            const memberAmount = amount - organizationAmount;
+
+            // Registrar la contribución
+            const contribution = registerContribution(
+                message.author.id,
+                message.author.username,
+                message.member.displayName || message.author.username,
+                amount,
+                description,
+                photoUrl
+            );
+
+            if (contribution) {
+                // Obtener balance actualizado
+                const userBalance = getUserBalance(message.author.id);
+                
+                const embed = new EmbedBuilder()
+                    .setColor(0x00ff00)
+                    .setTitle('✅ Aporte Registrado Exitosamente')
+                    .setDescription(`**${message.member.displayName || message.author.username}**`)
+                    .addFields([
+                        {
+                            name: '💵 Monto Total del Encargo',
+                            value: formatMoney(amount),
+                            inline: true
+                        },
+                        {
+                            name: '🏢 Aporte a la Organización',
+                            value: formatMoney(organizationAmount),
+                            inline: true
+                        },
+                        {
+                            name: '👤 Tu Ganancia',
+                            value: formatMoney(memberAmount),
+                            inline: true
+                        },
+                        {
+                            name: '💰 Balance Restante',
+                            value: formatMoney(userBalance.currentBalance),
+                            inline: true
+                        },
+                        {
+                            name: '🎯 Estado de Cuota',
+                            value: userBalance.currentBalance === 0 ? '✅ Completada' : '⏳ Pendiente',
+                            inline: true
+                        },
+                        {
+                            name: '📝 Descripción',
+                            value: description,
+                            inline: false
+                        }
+                    ])
+                    .setImage(photoUrl)
+                    .setFooter({ text: `ID: ${contribution.id} | Gunfighters - Sistema de Balances` })
+                    .setTimestamp();
+
+                const confirmMessage = await message.reply({ embeds: [embed] });
+
+                // Auto-eliminar confirmación después de 30 segundos
+                setTimeout(async () => {
+                    try {
+                        await confirmMessage.delete();
+                    } catch (error) {
+                        console.log(`⚠️ No se pudo eliminar confirmación de aporte: ${error.message}`);
+                    }
+                }, 30000);
+
+                // Auto-eliminar la imagen original si está configurado
+                if (process.env.AUTO_DELETE_PHOTOS === 'true') {
+                    setTimeout(async () => {
+                        try {
+                            await message.delete();
+                        } catch (error) {
+                            console.log(`⚠️ No se pudo eliminar imagen de aporte: ${error.message}`);
+                        }
+                    }, 35000);
+                }
+
+            } else {
+                message.reply('❌ Error al registrar el aporte. Inténtalo de nuevo.');
+            }
+
+        } catch (error) {
+            console.error('❌ Error registrando aporte:', error);
+            message.reply('❌ Error al procesar el aporte.');
+        }
+    }
+
+    // Comando para ver todos los balances (administradores)
+    if (command === 'balances') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        try {
+            const allBalances = getAllUserBalances();
+            const currentWeek = getCurrentWeekKey();
+            const settings = getSettings();
+
+            if (allBalances.length === 0) {
+                const embed = new EmbedBuilder()
+                    .setColor(0xffa500)
+                    .setTitle('💰 Balances Semanales')
+                    .setDescription('No hay usuarios con balances registrados.')
+                    .setTimestamp();
+                
+                return message.reply({ embeds: [embed] });
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor(0x3498db)
+                .setTitle('💰 Balances Semanales - Resumen')
+                .setDescription(`**Semana:** ${currentWeek}\n**Configuración:** ${settings.organizationPercentage}% para la organización`)
+                .setTimestamp();
+
+            let completedQuotas = 0;
+            let totalContributed = 0;
+
+            // Agrupar usuarios por estado
+            const usersWithDebt = [];
+            const usersCompleted = [];
+
+            for (const user of allBalances) {
+                totalContributed += user.weeklyContributed;
+                
+                if (user.currentBalance === 0) {
+                    completedQuotas++;
+                    usersCompleted.push(user);
+                } else {
+                    usersWithDebt.push(user);
+                }
+            }
+
+            // Estadísticas generales
+            embed.addFields([
+                {
+                    name: '📊 Estadísticas Generales',
+                    value: `**Usuarios activos:** ${allBalances.length}\n**Cuotas completadas:** ${completedQuotas}\n**Total aportado:** ${formatMoney(totalContributed)}`,
+                    inline: false
+                }
+            ]);
+
+            // Usuarios con deuda pendiente
+            if (usersWithDebt.length > 0) {
+                const debtList = usersWithDebt.slice(0, 10).map(user => {
+                    return `**${user.displayName}**: ${formatMoney(user.currentBalance)} restantes (Aportado: ${formatMoney(user.weeklyContributed)})`;
+                }).join('\n');
+                
+                embed.addFields([
+                    {
+                        name: '⏳ Usuarios con Cuota Pendiente',
+                        value: debtList + (usersWithDebt.length > 10 ? `\n... y ${usersWithDebt.length - 10} más` : ''),
+                        inline: false
+                    }
+                ]);
+            }
+
+            // Usuarios que completaron la cuota
+            if (usersCompleted.length > 0) {
+                const completedList = usersCompleted.slice(0, 10).map(user => {
+                    return `**${user.displayName}**: ✅ Cuota completa (${user.contributionsCount} aportes)`;
+                }).join('\n');
+                
+                embed.addFields([
+                    {
+                        name: '✅ Cuotas Completadas',
+                        value: completedList + (usersCompleted.length > 10 ? `\n... y ${usersCompleted.length - 10} más` : ''),
+                        inline: false
+                    }
+                ]);
+            }
+
+            message.reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Error consultando balances:', error);
+            message.reply('❌ Error al consultar los balances.');
+        }
+    }
+
+    // Comando para ver estadísticas detalladas de balance
+    if (command === 'estadisticas-balance') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        try {
+            const weeklyStats = getWeeklyStats();
+            const settings = getSettings();
+
+            const embed = new EmbedBuilder()
+                .setColor(0x9b59b6)
+                .setTitle('📈 Estadísticas Detalladas de Balances')
+                .setDescription(`**Semana:** ${weeklyStats.week}`)
+                .addFields([
+                    {
+                        name: '💰 Totales Financieros',
+                        value: `**Total en encargos:** ${formatMoney(weeklyStats.totalContributions)}\n**Aporte a organización:** ${formatMoney(weeklyStats.totalOrganizationAmount)}\n**Ganancia de miembros:** ${formatMoney(weeklyStats.totalMemberAmount)}`,
+                        inline: true
+                    },
+                    {
+                        name: '👥 Participación',
+                        value: `**Miembros activos:** ${weeklyStats.activeMembers}\n**Total de aportes:** ${weeklyStats.contributionsCount}\n**Promedio por miembro:** ${weeklyStats.activeMembers > 0 ? formatMoney(Math.floor(weeklyStats.totalOrganizationAmount / weeklyStats.activeMembers)) : '$0'}`,
+                        inline: true
+                    },
+                    {
+                        name: '⚙️ Configuración',
+                        value: `**Balance inicial:** ${formatMoney(settings.initialBalance)}\n**% Organización:** ${settings.organizationPercentage}%\n**% Miembros:** ${100 - settings.organizationPercentage}%`,
+                        inline: true
+                    }
+                ])
+                .setTimestamp();
+
+            // Top contribuyentes
+            if (weeklyStats.users.length > 0) {
+                const topContributors = weeklyStats.users.slice(0, 5).map((user, index) => {
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🔸';
+                    const status = user.quotaCompleted ? '✅' : '⏳';
+                    return `${medal} **${user.displayName}**: ${formatMoney(user.weeklyContributed)} ${status}`;
+                }).join('\n');
+                
+                embed.addFields([
+                    {
+                        name: '🏆 Top Contribuyentes de la Semana',
+                        value: topContributors,
+                        inline: false
+                    }
+                ]);
+            }
+
+            message.reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('❌ Error consultando estadísticas:', error);
+            message.reply('❌ Error al consultar las estadísticas.');
+        }
     }
 
 

@@ -13,7 +13,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:00:00.000Z"
   },
@@ -31,7 +33,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:01:00.000Z"
   },
@@ -49,7 +53,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:02:00.000Z"
   },
@@ -67,7 +73,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:03:00.000Z"
   },
@@ -86,7 +94,8 @@
       6
     ],
     "reminderSent": {
-      "2025-10-01": true
+      "2025-10-01": true,
+      "2025-10-02": true
     },
     "active": true,
     "createdAt": "2024-09-30T15:04:00.000Z"
@@ -105,7 +114,10 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true,
+      "2025-10-02": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:05:00.000Z"
   },
@@ -123,7 +135,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:06:00.000Z"
   },
@@ -141,7 +155,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:07:00.000Z"
   },
@@ -159,7 +175,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-02": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:08:00.000Z"
   },
@@ -177,7 +195,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:09:00.000Z"
   },
@@ -195,7 +215,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:10:00.000Z"
   },
@@ -213,7 +235,10 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true,
+      "2025-10-02": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:11:00.000Z"
   },
@@ -231,7 +256,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:12:00.000Z"
   },
@@ -249,7 +276,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-02": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:13:00.000Z"
   },
@@ -267,7 +296,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:14:00.000Z"
   },
@@ -285,7 +316,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:15:00.000Z"
   },
@@ -303,7 +336,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:16:00.000Z"
   },
@@ -321,7 +356,9 @@
       5,
       6
     ],
-    "reminderSent": {},
+    "reminderSent": {
+      "2025-10-01": true
+    },
     "active": true,
     "createdAt": "2024-09-30T15:17:00.000Z"
   }

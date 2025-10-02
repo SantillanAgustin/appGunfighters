@@ -1,0 +1,39 @@
+{
+  "users": {
+    "417479946177609729": {
+      "currentBalance": 45000,
+      "weeklyContributions": {
+        "2025-W40": [
+          {
+            "id": "1759416747162",
+            "totalAmount": 10000,
+            "organizationAmount": 5000,
+            "memberAmount": 5000,
+            "description": "Trabajo en restaurante La Mesa",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1422208762231394416/1423321768902529044/image.png?ex=68dfe331&is=68de91b1&hm=3c3c0ddc65edfe5bbbfc781c4bf78de8d12e0d943cb8922c6c7431d24be5d5e4&",
+            "timestamp": "2025-10-02T14:52:27.162Z",
+            "week": "2025-W40"
+          }
+        ]
+      },
+      "totalContributed": 5000,
+      "lastActivity": "2025-10-02T14:52:27.162Z",
+      "username": "naranjuwu",
+      "displayName": "Kylan Freizer"
+    }
+  },
+  "weeklyStats": {
+    "2025-W40": {
+      "totalContributions": 10000,
+      "totalOrganizationAmount": 5000,
+      "totalMemberAmount": 5000,
+      "activeMembers": 1,
+      "contributionsCount": 1
+    }
+  },
+  "lastReset": "2025-10-02T14:42:55.368Z",
+  "settings": {
+    "initialBalance": 50000,
+    "organizationPercentage": 50
+  }
+}

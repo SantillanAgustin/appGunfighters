@@ -1,4 +1,31 @@
-# 🎯 Gunfighters Bot - Documentación Completa
+# 🎯 Gunfighters Bot ### ✨ Características Pri```
+appGunfighters/
+├── src/
+│   ├── index.js                 # Archivo principal del bot
+│   └── utils/
+│       ├── activityManager.js   # Gestión de actividades y datos
+│       ├── reportFormatter.js   # Formateo de reportes
+│       ├── scheduleManager.js   # Sistema de recordatorios automáticos
+│       └── balanceManager.js    # Sistema de balances semanales (NUEVO)
+├── data/
+│   ├── activities.json          # Registro de todas las actividades
+│   ├── weeklyReports.json       # Reportes semanales generados
+│   ├── threads.json             # Mapeo de usuarios a hilos
+│   ├── persistentMessages.json  # IDs de mensajes persistentes
+│   ├── scheduledActivities.json # Actividades programadas del sistema
+│   └── balances.json            # Sistema de balances semanales (NUEVO)
+├── .env                         # Variables de entorno
+├── package.json                 # Dependencias del proyecto*Sistema de Registro Automatizado**: Los usuarios registran actividades enviando fotos como prueba
+- 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene su propio hilo para un seguimiento detallado
+- 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas
+- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC
+- 🔔 **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
+- 💰 **Sistema de Balances Semanales**: Gestión de cuotas de $50,000 semanales por miembro (NUEVO)
+- 💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
+- 🔒 **Control de Permisos**: Diferentes niveles de acceso según roles de Discord
+- 📸 **Validación por Fotos**: Sistema de verificación mediante imágenes
+- 🎯 **Actividades Específicas**: 6 tipos diferentes de trabajos de Gunfighters
+- 🗑️ **Auto-limpieza**: Eliminación automática de fotos y mensajes de confirmaciónción Completa
 
 ## 📋 Índice
 - [Descripción General](#descripción-general)
@@ -10,6 +37,7 @@
 - [Sistema de Reportes Semanales](#sistema-de-reportes-semanales)
 - [Sistema de Mensajes Persistentes](#sistema-de-mensajes-persistentes)
 - [Sistema de Recordatorios Automáticos](#sistema-de-recordatorios-automáticos)
+- [Sistema de Balances Semanales](#sistema-de-balances-semanales)
 - [Base de Datos](#base-de-datos)
 - [Instalación y Uso](#instalación-y-uso)
 - [Desarrollo](#desarrollo)
@@ -343,7 +371,136 @@ Las actividades pueden gestionarse mediante comandos:
 - **Precisión**: Notificaciones exactas 10 minutos antes
 - **Eficiencia**: Sistema optimizado sin spam ni duplicados
 
-## 🗃️ Base de Datos
+## � Sistema de Balances Semanales
+
+### 🎯 Descripción del Sistema
+
+El **Sistema de Balances Semanales** es la implementación más reciente de Gunfighters Bot, diseñado para gestionar la economía interna de la organización en GTA V Roleplay. Cada miembro activo debe cumplir con una cuota semanal de **$50,000** mediante trabajos externos.
+
+### 🔧 Funcionamiento Core
+
+#### 📋 Estructura de Balance
+- **Balance inicial**: $50,000 cada semana
+- **Trabajos externos**: Los miembros realizan trabajos fuera de la organización
+- **Aporte obligatorio**: 50% de cada ganancia va a la organización
+- **Objetivo**: Reducir el balance a $0 para completar la cuota semanal
+
+#### ⏰ Ciclo Semanal
+- **Inicio**: Lunes 00:00 UTC - Balance reset a $50,000
+- **Desarrollo**: Registro de aportes durante la semana
+- **Reset**: Domingo 23:59 UTC - Notificación automática y reset
+
+### 📝 Comandos Disponibles
+
+#### 👤 Para Miembros
+```bash
+!balance                        # Consultar balance personal
+!aportar [monto] [descripción]  # Registrar aporte (requiere screenshot)
+```
+
+#### 🔧 Para Administradores
+```bash
+!balances                      # Resumen de todos los balances
+!estadisticas-balance          # Estadísticas detalladas del sistema
+```
+
+### 🎮 Ejemplo de Uso Completo
+
+```bash
+# Escenario: Usuario trabaja en un restaurante
+Usuario: !aportar 10000 Trabajo en restaurante La Mesa
+[Adjunta screenshot del pago]
+
+# Resultado automático:
+- Balance anterior: $45,000
+- Trabajo realizado: $10,000
+- Aporte a organización: $5,000 (50%)
+- Ganancia personal: $5,000 (50%)
+- Nuevo balance: $40,000
+- Estado: ⏳ Pendiente ($40,000 restantes)
+```
+
+### 📊 Funcionalidades Avanzadas
+
+#### 🏆 Sistema de Rankings
+- **Top contribuyentes**: Ranking semanal por aportes
+- **Cuotas completadas**: Seguimiento de miembros al día
+- **Estadísticas globales**: Totales de organización y participación
+
+#### 📸 Validación por Evidencia
+- **Screenshot obligatorio**: Cada aporte debe incluir imagen
+- **Auto-limpieza**: Eliminación automática después de 30-35 segundos
+- **Verificación manual**: Los supervisores pueden revisar aportes
+
+#### 🔔 Notificaciones Automáticas
+- **Reset semanal**: Aviso cada domingo antes del reset
+- **Estado de balance**: Indicadores visuales (🟢 completado, 🟡 en progreso, 🔴 pendiente)
+- **Recordatorios**: Próximamente - alertas de cuotas pendientes
+
+### 🗃️ Estructura de Datos
+
+#### balances.json
+```json
+{
+  "users": {
+    "123456789": {
+      "userId": "123456789",
+      "username": "JohnDoe",
+      "displayName": "John Doe",
+      "currentBalance": 35000,
+      "weeklyContributions": {
+        "2024-W50": [
+          {
+            "id": "contrib_001",
+            "timestamp": "2024-12-15T14:30:00Z",
+            "totalAmount": 15000,
+            "organizationAmount": 7500,
+            "memberAmount": 7500,
+            "description": "Trabajo restaurante",
+            "photoUrl": "https://cdn.discord.com/..."
+          }
+        ]
+      }
+    }
+  },
+  "settings": {
+    "initialBalance": 50000,
+    "organizationPercentage": 50
+  }
+}
+```
+
+### 🔍 Análisis y Reportes
+
+#### 📈 Métricas Semanales
+- **Participación**: Número de miembros activos
+- **Recaudación total**: Suma de todos los aportes organizacionales
+- **Promedio por miembro**: Distribución de contribuciones
+- **Tasa de completitud**: Porcentaje de cuotas completadas
+
+#### 📋 Informes Automáticos
+- **Balance individual**: Estado personalizado de cada miembro
+- **Resumen administrativo**: Vista general para supervisores
+- **Estadísticas detalladas**: Análisis profundo del sistema
+
+### ⚙️ Configuración del Sistema
+
+#### 🛠️ Variables Configurables
+```javascript
+// En balanceManager.js
+const SETTINGS = {
+    initialBalance: 50000,        // Balance inicial semanal
+    organizationPercentage: 50,   // % que va a la organización
+    autoDeleteDelay: 30000        // Tiempo de auto-limpieza
+};
+```
+
+#### 🔧 Integración con Bot Principal
+- **Imports necesarios**: balanceManager completo en index.js
+- **Comandos integrados**: Sistema modular sin conflictos
+- **Reset automático**: Función checkWeeklyBalanceReset cada minuto
+
+## �🗃️ Base de Datos
 
 ### 📄 activities.json
 Almacena todos los registros de actividades:
