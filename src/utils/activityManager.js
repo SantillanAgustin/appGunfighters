@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { getWeeklyStats, getAllUserBalances } = require('./balanceManager');
 
 const dataPath = path.join(__dirname, '..', '..', 'data', 'activities.json');
 
@@ -295,6 +296,10 @@ function generateWeeklyReport(week = null) {
     const data = loadData();
     const targetWeek = week || getCurrentWeek();
     
+    // Obtener estadísticas de balance para la semana
+    const balanceStats = getWeeklyStats();
+    const allBalances = getAllUserBalances();
+    
     const report = {
         week: targetWeek,
         totalUsers: 0,
@@ -308,6 +313,15 @@ function generateWeeklyReport(week = null) {
             limpieza_rascacielos: 0
         },
         userStats: [],
+        // Nuevas estadísticas de balance
+        balanceStats: {
+            totalContributions: balanceStats.totalContributions,
+            totalOrganizationAmount: balanceStats.totalOrganizationAmount,
+            activeMembers: balanceStats.activeMembers,
+            contributionsCount: balanceStats.contributionsCount,
+            completedQuotas: allBalances.filter(user => user.currentBalance === 0).length,
+            pendingQuotas: allBalances.filter(user => user.currentBalance > 0).length
+        },
         generatedAt: new Date().toISOString()
     };
     
@@ -315,6 +329,9 @@ function generateWeeklyReport(week = null) {
     for (const userId in data.users) {
         const user = data.users[userId];
         const weekActivities = user.activities[targetWeek];
+        
+        // Buscar datos de balance del usuario
+        const userBalance = allBalances.find(balance => balance.userId === userId);
         
         if (weekActivities) {
             const userTotal = Object.keys(report.activityStats).reduce((sum, activity) => {
@@ -331,7 +348,14 @@ function generateWeeklyReport(week = null) {
                     userId: userId,
                     username: user.username,
                     totalActivities: userTotal,
-                    activities: { ...report.activityStats }
+                    activities: { ...report.activityStats },
+                    // Agregar datos de balance
+                    balance: {
+                        currentBalance: userBalance ? userBalance.currentBalance : 50000,
+                        weeklyContributed: userBalance ? userBalance.weeklyContributed : 0,
+                        contributionsCount: userBalance ? userBalance.contributionsCount : 0,
+                        quotaCompleted: userBalance ? userBalance.currentBalance === 0 : false
+                    }
                 });
             }
         }

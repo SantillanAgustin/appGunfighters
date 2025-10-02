@@ -18,7 +18,7 @@ appGunfighters/
 ├── package.json                 # Dependencias del proyecto*Sistema de Registro Automatizado**: Los usuarios registran actividades enviando fotos como prueba
 - 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene su propio hilo para un seguimiento detallado
 - 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas
-- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC
+- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC con integración completa
 - 🔔 **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
 - 💰 **Sistema de Balances Semanales**: Gestión de cuotas de $50,000 semanales por miembro (NUEVO)
 - 💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
@@ -204,6 +204,29 @@ El bot reconoce 6 tipos específicos de actividades de Gunfighters:
 5. **Validación**: El bot verifica que el número de fotos sea correcto
 6. **Completado**: Se registra la actividad y se envía al hilo personal
 7. **Auto-limpieza**: Las fotos se eliminan automáticamente si está configurado
+
+### 📊 Consulta de Progreso Personal
+
+#### 🔍 Funcionalidad Integrada
+Los usuarios pueden consultar su progreso usando el botón **"📊 Consultar Mis Actividades"** desde el mensaje persistente, que ahora muestra información completa:
+
+**✅ Información de Actividades:**
+- Desglose detallado por tipo de actividad
+- Total de actividades registradas en la semana
+- Contador específico para cada categoría
+
+**✅ Información de Balance (NUEVO):**
+- Balance restante de la cuota semanal ($50,000)
+- Total aportado a la organización
+- Estado de la cuota (✅ Completada / ⏳ Pendiente)  
+- Número de contribuciones realizadas
+- Semana actual del sistema
+
+#### 🎨 Interfaz Visual
+- **Colores dinámicos**: Verde (cuota completa), Naranja (progreso), Rojo (inicio)
+- **Información estructurada**: Campos organizados para fácil lectura
+- **Indicadores visuales**: Emojis y estados claros
+- **Respuesta privada**: Solo visible para el usuario consultante
 
 ### ⏱️ Timeouts y Validaciones
 
@@ -499,6 +522,40 @@ const SETTINGS = {
 - **Imports necesarios**: balanceManager completo en index.js
 - **Comandos integrados**: Sistema modular sin conflictos
 - **Reset automático**: Función checkWeeklyBalanceReset cada minuto
+- **Reportes integrados**: Los reportes semanales automáticos incluyen datos de actividades Y balances
+
+### 📊 Reportes Semanales Integrados
+
+El sistema genera automáticamente reportes completos que combinan:
+
+#### 📈 Datos de Actividades
+- Número total de actividades registradas
+- Top 3 usuarios más activos con medallas
+- Desglose por tipo de actividad
+- Promedio de actividades por usuario
+
+#### 💰 Datos de Balances  
+- Total aportado a la organización
+- Número de cuotas completadas vs pendientes
+- Estado individual de balance por usuario
+- Total de contribuciones registradas
+
+#### 🎯 Formato del Reporte
+```
+📊 Informe Semanal Completo - Gunfighters
+Semana del 2024-W50
+
+📈 Estadísticas Generales    💰 Estadísticas de Balances
+👥 Usuarios Activos: 8       💵 Total Aportado: $125,000
+📅 Total Actividades: 45     ✅ Cuotas Completadas: 5
+📊 Promedio por Usuario: 5.6 ⏳ Cuotas Pendientes: 3
+                            📋 Total de Aportes: 28
+
+🏆 Usuarios de la Semana
+🥇 Usuario1: 12 actividades (Balance: ✅ Completado)
+🥈 Usuario2: 8 actividades (Balance: ⏳ $15,000)
+🥉 Usuario3: 7 actividades (Balance: ✅ Completado)
+```
 
 ## �🗃️ Base de Datos
 

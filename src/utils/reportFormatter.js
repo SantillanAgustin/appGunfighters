@@ -5,20 +5,36 @@ const { EmbedBuilder } = require('discord.js');
  */
 function formatWeeklyReport(report) {
     const embed = new EmbedBuilder()
-        .setTitle('📊 Informe Semanal de Actividades - Gunfighters')
+        .setTitle('📊 Informe Semanal Completo - Gunfighters')
         .setDescription(`**Semana del ${report.week}**`)
         .setColor(0x0099ff)
         .setTimestamp()
-        .setFooter({ text: 'Gunfighters - Sistema de Actividades' });
+        .setFooter({ text: 'Gunfighters - Sistema Integrado de Actividades y Balances' });
 
-    // Estadísticas generales
+    // Estadísticas generales combinadas
     embed.addFields({
         name: '📈 Estadísticas Generales',
-        value: `👥 **Usuarios Activos:** ${report.totalUsers}\n📅 **Promedio por Usuario:** ${report.totalUsers > 0 ? Math.round(report.totalActivities / report.totalUsers * 100) / 100 : 0}`,
-        inline: false
+        value: `👥 **Usuarios Activos:** ${report.totalUsers}\n📅 **Total de Actividades:** ${report.totalActivities}\n📊 **Promedio por Usuario:** ${report.totalUsers > 0 ? Math.round(report.totalActivities / report.totalUsers * 100) / 100 : 0}`,
+        inline: true
     });
 
-    // Usuarios de la semana - Top 3 destacados + resto
+    // Estadísticas de balances si existen
+    if (report.balanceStats) {
+        const formatMoney = (amount) => new Intl.NumberFormat('es-ES', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+
+        embed.addFields({
+            name: '💰 Estadísticas de Balances',
+            value: `💵 **Total Aportado:** ${formatMoney(report.balanceStats.totalOrganizationAmount)}\n✅ **Cuotas Completadas:** ${report.balanceStats.completedQuotas}\n⏳ **Cuotas Pendientes:** ${report.balanceStats.pendingQuotas}\n📋 **Total de Aportes:** ${report.balanceStats.contributionsCount}`,
+            inline: true
+        });
+    }
+
+    // Usuarios de la semana - Top 3 destacados + resto con información de balance
     if (report.userStats.length > 0) {
         let usersText = '';
         
@@ -27,7 +43,10 @@ function formatWeeklyReport(report) {
         const top3 = report.userStats.slice(0, 3);
         
         top3.forEach((user, index) => {
-            usersText += `${topMedals[index]} **${user.username}**: ${user.totalActivities} actividades\n`;
+            const balanceInfo = user.balance ? 
+                `(Balance: ${user.balance.quotaCompleted ? '✅ Completado' : `⏳ $${user.balance.currentBalance.toLocaleString()}`})` : 
+                '';
+            usersText += `${topMedals[index]} **${user.username}**: ${user.totalActivities} actividades ${balanceInfo}\n`;
         });
         
         // Resto de usuarios activos (si hay más de 3)
@@ -35,7 +54,10 @@ function formatWeeklyReport(report) {
         if (restUsers.length > 0) {
             usersText += '\n**Otros usuarios activos:**\n';
             restUsers.forEach((user) => {
-                usersText += `🎖️ **${user.username}**: ${user.totalActivities} actividades\n`;
+                const balanceInfo = user.balance ? 
+                    `(${user.balance.quotaCompleted ? '✅' : '⏳'})` : 
+                    '';
+                usersText += `🎖️ **${user.username}**: ${user.totalActivities} actividades ${balanceInfo}\n`;
             });
         }
 

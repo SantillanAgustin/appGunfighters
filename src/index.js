@@ -1649,12 +1649,28 @@ client.on('interactionCreate', async interaction => {
 
         if (interaction.customId === 'consultar_actividades') {
         const activities = getUserActivities(interaction.user.id);
+        const userBalance = getUserBalance(interaction.user.id);
+        const currentWeek = getCurrentWeekKey();
+        const weeklyContributions = userBalance.weeklyContributions[currentWeek] || [];
+        const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
         
         const embed = new EmbedBuilder()
             .setColor(0x3498db)
-            .setTitle('📊 Consultar Actividades')
-            .setDescription(`**Tus actividades esta semana:**\n\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**Total: ${activities.total} actividades**`)
-            .setFooter({ text: 'Registro semanal se reinicia los domingos a las 23:59' })
+            .setTitle('📊 Consultar Actividades y Balance')
+            .setDescription(`**${interaction.member.displayName || interaction.user.username}**\n\n**🎯 Actividades esta semana:**\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**📊 Total actividades: ${activities.total}**`)
+            .addFields([
+                {
+                    name: '💰 Balance Semanal',
+                    value: `**Restante:** ${formatMoney(userBalance.currentBalance)}\n**Aportado:** ${formatMoney(weeklyTotal)}\n**Estado:** ${userBalance.currentBalance === 0 ? '✅ Completado' : '⏳ Pendiente'}`,
+                    inline: true
+                },
+                {
+                    name: '📋 Contribuciones',
+                    value: `**Aportes:** ${weeklyContributions.length}\n**Semana:** ${currentWeek}`,
+                    inline: true
+                }
+            ])
+            .setFooter({ text: 'Los datos se reinician cada domingo a las 23:59 UTC' })
             .setTimestamp();
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
@@ -1664,12 +1680,33 @@ client.on('interactionCreate', async interaction => {
         if (interaction.customId.startsWith('persistent_')) {
             if (interaction.customId === 'persistent_consultar_actividades') {
                 const activities = getUserActivities(interaction.user.id);
+                const userBalance = getUserBalance(interaction.user.id);
+                const currentWeek = getCurrentWeekKey();
+                const weeklyContributions = userBalance.weeklyContributions[currentWeek] || [];
+                const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
                 
                 const embed = new EmbedBuilder()
-                    .setColor(0x3498db)
-                    .setTitle('📊 Tus Actividades Esta Semana')
-                    .setDescription(`**Resumen de actividades registradas:**\n\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**Total: ${activities.total} actividades**`)
-                    .setFooter({ text: 'Las estadísticas se reinician cada domingo a las 23:59 UTC' })
+                    .setColor(userBalance.currentBalance === 0 ? 0x00ff00 : userBalance.currentBalance < 25000 ? 0xffa500 : 0xff0000)
+                    .setTitle('📊 Tus Actividades y Balance Esta Semana')
+                    .setDescription(`**${interaction.member.displayName || interaction.user.username}**\n\n**🎯 Actividades registradas:**\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**📊 Total actividades: ${activities.total}**`)
+                    .addFields([
+                        {
+                            name: '💰 Balance Semanal',
+                            value: `**Restante:** ${formatMoney(userBalance.currentBalance)}\n**Aportado:** ${formatMoney(weeklyTotal)}`,
+                            inline: true
+                        },
+                        {
+                            name: '🎯 Estado de Cuota',
+                            value: userBalance.currentBalance === 0 ? '✅ **Completada**' : '⏳ **Pendiente**',
+                            inline: true
+                        },
+                        {
+                            name: '📋 Contribuciones',
+                            value: `**${weeklyContributions.length}** aportes realizados\n**Semana:** ${currentWeek}`,
+                            inline: true
+                        }
+                    ])
+                    .setFooter({ text: 'Los datos se reinician cada domingo a las 23:59 UTC | Usa !aportar para registrar contribuciones' })
                     .setTimestamp();
 
                 await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });

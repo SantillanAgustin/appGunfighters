@@ -4,28 +4,72 @@
       "username": "Pepito",
       "activities": {
         "2025-W40": {
-          "limpieza_espacios": 1,
+          "limpieza_espacios": 0,
           "abastecimiento_electrico": 0,
-          "asesoramiento_empresarial": 0,
+          "asesoramiento_empresarial": 1,
           "jardineria": 0,
           "mantenimiento_gasolineras": 0,
           "limpieza_rascacielos": 0,
           "history": [
             {
-              "type": "limpieza_espacios",
-              "timestamp": "2025-10-02T14:50:27.511Z",
+              "type": "asesoramiento_empresarial",
+              "timestamp": "2025-10-02T15:21:18.350Z",
               "proofImages": [
-                "https://cdn.discordapp.com/attachments/1422241465089654895/1423321266470785207/image.png?ex=68dfe2b9&is=68de9139&hm=ddb6edbb842a053f7380114343df1d656f5136b499bf531f5170c1a682309ea1&"
+                "https://cdn.discordapp.com/attachments/1422241465089654895/1423329029653532825/image.png?ex=68dfe9f4&is=68de9874&hm=136529d0e955c1aa7b571fd8b81a80aeea8264761b7e752417ea10a00490c393&"
               ]
             }
           ]
         }
       },
-      "threadId": "1423321270056915027"
+      "threadId": "1423329034233970810"
     }
   },
-  "weeklyReports": {},
+  "weeklyReports": {
+    "2025-W40": {
+      "week": "2025-W40",
+      "totalUsers": 1,
+      "totalActivities": 1,
+      "activityStats": {
+        "limpieza_espacios": 0,
+        "abastecimiento_electrico": 0,
+        "asesoramiento_empresarial": 1,
+        "jardineria": 0,
+        "mantenimiento_gasolineras": 0,
+        "limpieza_rascacielos": 0
+      },
+      "userStats": [
+        {
+          "userId": "1304717444895473687",
+          "username": "Pepito",
+          "totalActivities": 1,
+          "activities": {
+            "limpieza_espacios": 0,
+            "abastecimiento_electrico": 0,
+            "asesoramiento_empresarial": 1,
+            "jardineria": 0,
+            "mantenimiento_gasolineras": 0,
+            "limpieza_rascacielos": 0
+          },
+          "balance": {
+            "currentBalance": 37500,
+            "weeklyContributed": 12500,
+            "contributionsCount": 2,
+            "quotaCompleted": false
+          }
+        }
+      ],
+      "balanceStats": {
+        "totalContributions": 35000,
+        "totalOrganizationAmount": 17500,
+        "activeMembers": 2,
+        "contributionsCount": 3,
+        "completedQuotas": 0,
+        "pendingQuotas": 2
+      },
+      "generatedAt": "2025-10-02T15:23:49.134Z"
+    }
+  },
   "currentWeek": "2025-W40",
   "pendingRegistrations": {},
-  "persistentMessageId": "1422397175211753526"
+  "persistentMessageId": "1423332690505105530"
 }

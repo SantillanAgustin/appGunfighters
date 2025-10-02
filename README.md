@@ -1,6 +1,12 @@
 # 🎯 Gunfighters Discord Bot
 
-Bot automatizado para la organización **Gunfighters** en **GTA V Roleplay** que gestiona el registro de actividades laborales, crea hilos personalizados y genera reportes semanales automáticos.
+Bot automatizado para la organización **Gunfighters** ### Sistema Automático
+- ⏰ **Reportes semanales integrados** - Cada domingo 23:59 UTC (incluye actividades Y balances)
+- 🔔 **Recordatorios de actividades** - 10 minutos antes de cada actividad del sistema
+- 💰 **Reset de balances** - Automático cada domingo con notificación
+- 🔄 **Verificación de mensajes** - Cada 5 minutos
+- 🧵 **Creación de hilos** - Automática al primer registro
+- 🗑️ **Limpieza de confirmaciones** - 25 segundos despuésTA V Roleplay** que gestiona el registro de actividades laborales, crea hilos personalizados y genera reportes semanales automáticos.
 
 ## ✨ Características Principales
 
@@ -84,6 +90,16 @@ npm start
 4. **Confirmación automática** - El bot registra y confirma
 5. **Auto-limpieza** - Las fotos se eliminan automáticamente
 
+### Consultar Progreso Personal
+1. **Usar el botón "📊 Consultar Mis Actividades"** en el mensaje persistente
+2. **Ver información completa**: Actividades registradas Y balance semanal
+3. **Información mostrada**:
+   - Actividades completadas por tipo
+   - Balance restante de la cuota semanal
+   - Total aportado a la organización
+   - Estado de la cuota (completada/pendiente)
+   - Número de contribuciones realizadas
+
 ### Sistema Automático
 - ⏰ **Reportes semanales** - Cada domingo 23:59 UTC
 - � **Recordatorios de actividades** - 10 minutos antes de cada actividad del sistema
@@ -121,8 +137,9 @@ appGunfighters/
 ## 📊 Funcionalidades Avanzadas
 
 ### Reportes Semanales
-- 🏆 **Top 3 usuarios** con medallas (🥇🥈🥉)
-- 👥 **Lista completa** de usuarios activos
+- 🏆 **Top 3 usuarios** con medallas (🥇🥈🥉) + estado de cuota
+- 👥 **Lista completa** de usuarios activos con balance
+- 💰 **Estadísticas financieras** integradas (aportes, cuotas completadas)
 - 📅 **Rango de fechas** automático
 - 💾 **Guardado persistente** en JSON
 
