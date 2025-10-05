@@ -1,6 +1,37 @@
 {
-  "users": {},
-  "weeklyStats": {},
+  "users": {
+    "417479946177609729": {
+      "currentBalance": 20000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "1759707810042",
+            "totalAmount": 60000,
+            "organizationAmount": 30000,
+            "memberAmount": 30000,
+            "description": "Limpieza de mall",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424542554510065694/image.png?ex=68e45423&is=68e302a3&hm=c1ffa8071c3aedaa3e90bed17b7e092a71ddb515521d6abbc39110978ce1862e&",
+            "timestamp": "2025-10-05T23:43:30.042Z",
+            "week": "2025-W41"
+          }
+        ]
+      },
+      "totalContributed": 30000,
+      "lastActivity": "2025-10-05T23:43:30.042Z",
+      "username": "naranjuwu",
+      "displayName": "Test dev",
+      "balanceThreadId": "1424542558054387774"
+    }
+  },
+  "weeklyStats": {
+    "2025-W41": {
+      "totalContributions": 60000,
+      "totalOrganizationAmount": 30000,
+      "totalMemberAmount": 30000,
+      "activeMembers": 1,
+      "contributionsCount": 1
+    }
+  },
   "lastReset": "2025-10-05T23:05:15.167Z",
   "settings": {
     "initialBalance": 50000,

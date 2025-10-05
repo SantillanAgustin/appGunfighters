@@ -1,7 +1,39 @@
 {
-  "users": {},
+  "users": {
+    "417479946177609729": {
+      "username": "Test dev",
+      "activities": {
+        "2025-W41": {
+          "limpieza_espacios": 1,
+          "abastecimiento_electrico": 0,
+          "asesoramiento_empresarial": 0,
+          "jardineria": 0,
+          "mantenimiento_gasolineras": 1,
+          "limpieza_rascacielos": 0,
+          "history": [
+            {
+              "type": "limpieza_espacios",
+              "timestamp": "2025-10-05T23:42:22.043Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1424542269289009172/image.png?ex=68e453df&is=68e3025f&hm=c45bbff914a65d55c6174d1ab580ffd2999233e4024748d6dce4508d62fb6662&"
+              ]
+            },
+            {
+              "type": "mantenimiento_gasolineras",
+              "timestamp": "2025-10-05T23:42:35.940Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1424542327728246945/image.png?ex=68e453ed&is=68e3026d&hm=d9cbc9a011051eb0b05cd19ca18f8831b14bb403bca051ccf1c7de40f0c79628&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1424542272527138929"
+    }
+  },
   "weeklyReports": {},
   "currentWeek": "2025-W41",
   "pendingRegistrations": {},
-  "persistentMessageId": "1424523078104252418"
+  "persistentMessageId": "1424523078104252418",
+  "pendingAportes": {}
 }

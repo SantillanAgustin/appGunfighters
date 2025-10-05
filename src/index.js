@@ -351,11 +351,11 @@ async function checkScheduledReminders() {
             
             const embed = new EmbedBuilder()
                 .setColor(0xff6b35)
-                .setTitle('⏰ Recordatorio de Actividad - HORA HUB')
+                .setTitle('⏰ Recordatorio de Actividad')
                 .setDescription(`**${activity.name}** comenzará en **10 minutos**`)
                 .addFields([
                     {
-                        name: '🕐 Hora de inicio (UTC)',
+                        name: '🕐 Hora de inicio (HUB)',
                         value: `${activity.activityTime}`,
                         inline: true
                     },
@@ -378,11 +378,7 @@ async function checkScheduledReminders() {
                 ]);
             }
 
-            // Mencionar al rol supervisor si está configurado
-            let content = '🔔 **RECORDATORIO DE ACTIVIDAD**';
-            if (process.env.SUPERVISOR_ROLE_ID) {
-                content += `\n<@&${process.env.SUPERVISOR_ROLE_ID}>`;
-            }
+            let content = '';
 
             await reminderChannel.send({
                 content: content,

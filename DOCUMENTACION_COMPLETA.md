@@ -1,58 +1,38 @@
-# 🎯 Gunfighters Bot ### ✨ Características Pri```
-appGunfighters/
-├── src/
-│   ├── index.js                 # Archivo principal del bot
-│   └── utils/
-│       ├── activityManager.js   # Gestión de actividades y datos
-│       ├── reportFormatter.js   # Formateo de reportes
-│       ├── scheduleManager.js   # Sistema de recordatorios automáticos
-│       └── balanceManager.js    # Sistema de balances semanales (NUEVO)
-├── data/
-│   ├── activities.json          # Registro de todas las actividades
-│   ├── weeklyReports.json       # Reportes semanales generados
-│   ├── threads.json             # Mapeo de usuarios a hilos
-│   ├── persistentMessages.json  # IDs de mensajes persistentes
-│   ├── scheduledActivities.json # Actividades programadas del sistema
-│   └── balances.json            # Sistema de balances semanales (NUEVO)
-├── .env                         # Variables de entorno
-├── package.json                 # Dependencias del proyecto*Sistema de Registro Automatizado**: Los usuarios registran actividades enviando fotos como prueba
-- 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene su propio hilo para un seguimiento detallado
-- 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas
-- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC con integración completa
-- 🔔 **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
-- 💰 **Sistema de Balances Semanales**: Gestión de cuotas de $50,000 semanales por miembro (NUEVO)
-- 💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
-- 🔒 **Control de Permisos**: Diferentes niveles de acceso según roles de Discord
-- 📸 **Validación por Fotos**: Sistema de verificación mediante imágenes
-- 🎯 **Actividades Específicas**: 6 tipos diferentes de trabajos de Gunfighters
-- 🗑️ **Auto-limpieza**: Eliminación automática de fotos y mensajes de confirmaciónción Completa
+# 🎯 Gunfighters Bot - Documentación Completa
 
 ## 📋 Índice
 - [Descripción General](#descripción-general)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Configuración](#configuración)
 - [Comandos Disponibles](#comandos-disponibles)
-- [Sistema de Registro](#sistema-de-registro)
-- [Sistema de Hilos](#sistema-de-hilos)
+- [Sistema de Registro de Actividades](#sistema-de-registro-de-actividades)
+- [Sistema de Balances Semanales](#sistema-de-balances-semanales)
+- [Sistema de Hilos Duales](#sistema-de-hilos-duales)
 - [Sistema de Reportes Semanales](#sistema-de-reportes-semanales)
 - [Sistema de Mensajes Persistentes](#sistema-de-mensajes-persistentes)
 - [Sistema de Recordatorios Automáticos](#sistema-de-recordatorios-automáticos)
-- [Sistema de Balances Semanales](#sistema-de-balances-semanales)
 - [Base de Datos](#base-de-datos)
 - [Instalación y Uso](#instalación-y-uso)
 - [Desarrollo](#desarrollo)
 
-## � Descripción General
+## 📝 Descripción General
 
-Gunfighters Bot es un sistema automatizado diseñado específicamente para la organización **Gunfighters** en **GTA V Roleplay**. El bot gestiona el registro de actividades laborales de los miembros, crea hilos personalizados para cada usuario, mantiene estadísticas detalladas de participación, y genera reportes semanales automáticos.
+Gunfighters Bot es un sistema automatizado diseñado específicamente para la organización **Gunfighters** en **GTA V Roleplay**. El bot gestiona:
+
+- **Registro de actividades laborales** con validación fotográfica
+- **Sistema de balances semanales** con cuotas de $50,000
+- **Hilos personalizados duales** (actividades + aportes económicos)
+- **Reportes semanales automáticos** integrados
+- **Interfaz moderna** con botones persistentes y formularios modales
 
 ### ✨ Características Principales
-- 📊 **Sistema de Registro Automatizado**: Los usuarios registran actividades enviando fotos como prueba
-- 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene su propio hilo para un seguimiento detallado
-- 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas
-- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC
-- � **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
-- �💬 **Mensajes Persistentes**: Interfaz permanente para registro de actividades
+- 📊 **Sistema de Registro Automatizado**: Usuarios registran actividades enviando fotos como prueba
+- 🧵 **Gestión de Hilos Personalizados**: Cada usuario tiene hilos separados para actividades y aportes
+- 📈 **Estadísticas y Reportes**: Informes automáticos de actividades completadas Y balances financieros
+- ⏰ **Reportes Semanales Automáticos**: Generación automática cada domingo a las 23:59 UTC con integración completa
+- 🔔 **Sistema de Recordatorios**: Notificaciones automáticas 10 minutos antes de actividades del sistema
+- 💰 **Sistema de Balances Semanales**: Gestión de cuotas de $50,000 semanales por miembro ✨ NUEVO
+- 💬 **Mensajes Persistentes**: Interfaz permanente con botones para registro y consultas
 - 🔒 **Control de Permisos**: Diferentes niveles de acceso según roles de Discord
 - 📸 **Validación por Fotos**: Sistema de verificación mediante imágenes
 - 🎯 **Actividades Específicas**: 6 tipos diferentes de trabajos de Gunfighters
@@ -67,13 +47,15 @@ appGunfighters/
 │   └── utils/
 │       ├── activityManager.js   # Gestión de actividades y datos
 │       ├── reportFormatter.js   # Formateo de reportes
-│       └── scheduleManager.js   # Sistema de recordatorios automáticos
+│       ├── scheduleManager.js   # Sistema de recordatorios automáticos
+│       └── balanceManager.js    # Sistema de balances semanales ✨ NUEVO
 ├── data/
 │   ├── activities.json          # Registro de todas las actividades
 │   ├── weeklyReports.json       # Reportes semanales generados
-│   ├── threads.json             # Mapeo de usuarios a hilos
+│   ├── threads.json             # Mapeo de usuarios a hilos de actividades
 │   ├── persistentMessages.json  # IDs de mensajes persistentes
-│   └── scheduledActivities.json # Actividades programadas del sistema
+│   ├── scheduledActivities.json # Actividades programadas del sistema
+│   └── balances.json            # Sistema de balances y aportes ✨ NUEVO
 ├── .env                         # Variables de entorno
 ├── package.json                 # Dependencias del proyecto
 ├── README.md                    # Documentación básica
@@ -90,14 +72,75 @@ DISCORD_TOKEN=tu_token_aqui
 # ID del servidor de Discord
 GUILD_ID=tu_guild_id_aqui
 
-# ID del canal donde se crearán los hilos
-THREADS_CHANNEL_ID=tu_canal_id_aqui
+# CANALES DE DISCORD (todos requeridos)
+# ID del canal donde se crearán los hilos de actividades - Log-actividades
+THREADS_CHANNEL_ID=tu_canal_hilos_actividades_id
 
-# ID del rol de supervisor (opcional)
-SUPERVISOR_ROLE_ID=tu_rol_id_aqui
+# ID del canal donde se crearán los hilos de aportes/balance ✨ NUEVO
+BALANCE_THREADS_CHANNEL_ID=tu_canal_hilos_balance_id
 
-# ID del canal para mensajes persistentes de registro
-REGISTER_CHANNEL_ID=tu_canal_registro_id_aqui
+# ID del canal donde estará el mensaje persistente de registro - registro-actividades
+REGISTER_CHANNEL_ID=tu_canal_registro_id
+
+# ID del canal donde se enviarán los recordatorios de actividades programadas
+REMINDERS_CHANNEL_ID=tu_canal_recordatorios_id
+
+# ID del canal donde se enviarán los informes semanales automáticos ✨ NUEVO
+REPORTS_CHANNEL_ID=tu_canal_informes_id
+
+# ROLES DE DISCORD (opcionales pero recomendados)
+# ID del rol que será etiquetado en nuevos hilos
+SUPERVISOR_ROLE_ID=tu_rol_supervisor_id
+
+# ID del rol de líderes (permisos especiales) ✨ NUEVO  
+LIDER_ROLE_ID=tu_rol_lider_id
+
+# CONFIGURACIONES DEL BOT
+# Eliminar automáticamente las fotos del canal después de procesarlas
+AUTO_DELETE_PHOTOS=true
+
+# Prefijo para los comandos del bot
+PREFIX=!
+```
+
+### Configuración de Canales
+
+#### 🎯 Canal de Hilos de Actividades (`THREADS_CHANNEL_ID`)
+- **Propósito**: Donde se crean hilos individuales para cada usuario al registrar su primera actividad
+- **Permisos requeridos**: Crear hilos públicos, Gestionar hilos, Enviar mensajes
+- **Ejemplo**: `#log-actividades`
+
+#### 💰 Canal de Hilos de Balance (`BALANCE_THREADS_CHANNEL_ID`) ✨ NUEVO
+- **Propósito**: Donde se crean hilos individuales para seguimiento de aportes económicos
+- **Permisos requeridos**: Crear hilos públicos, Gestionar hilos, Enviar mensajes
+- **Ejemplo**: `#hilos-balance`
+
+#### 📝 Canal de Registro (`REGISTER_CHANNEL_ID`)
+- **Propósito**: Donde se coloca el mensaje persistente con botones de registro
+- **Permisos requeridos**: Enviar mensajes, Usar emojis externos, Usar comandos de aplicación
+- **Ejemplo**: `#registro-actividades`
+
+#### 🔔 Canal de Recordatorios (`REMINDERS_CHANNEL_ID`)
+- **Propósito**: Donde se envían notificaciones automáticas de actividades programadas
+- **Permisos requeridos**: Enviar mensajes, Mencionar @everyone, @here y todos los roles
+- **Ejemplo**: `#recordatorios-actividades`
+
+#### 📊 Canal de Informes (`REPORTS_CHANNEL_ID`) ✨ NUEVO
+- **Propósito**: Donde se envían informes semanales automáticos y notificaciones de reset de balance
+- **Permisos requeridos**: Enviar mensajes, Incrustar enlaces
+- **Ejemplo**: `#informes-semanales`
+
+### Configuración de Roles
+
+#### 👥 Rol Supervisor (`SUPERVISOR_ROLE_ID`)
+- **Propósito**: Etiquetado en hilos nuevos y notificaciones importantes
+- **Permisos sugeridos**: Gestionar mensajes, Ver canales, Enviar mensajes
+- **Opcional**: Sí, pero altamente recomendado
+
+#### 🎖️ Rol Líder (`LIDER_ROLE_ID`) ✨ NUEVO
+- **Propósito**: Acceso a comandos administrativos sin permisos de administrador completos
+- **Permisos especiales**: Comando `!limpiar-todo`, gestión de sistema
+- **Opcional**: Sí, útil para delegar responsabilidades
 
 # Auto-eliminación de fotos (true/false)
 AUTO_DELETE_PHOTOS=true
@@ -120,52 +163,131 @@ PREFIX=!
 
 ### 👤 Comandos de Usuario
 
-#### `!registro`
-Muestra el formulario interactivo para registrar actividades.
-- **Uso**: `!registro`
-- **Descripción**: Despliega botones para cada tipo de actividad
-- **Permisos**: Todos los usuarios
-- **Nota**: También disponible como mensaje persistente
+#### **Interfaz Principal - Botones Persistentes**
+El bot mantiene un mensaje permanente en el canal de registro con:
+- 🎯 **Registrar Actividad** - Abre selector de 6 actividades específicas
+- 💰 **Aportar** - Abre formulario modal para registrar aportes económicos
+- 📊 **Consultar Actividades** - Ver progreso personal completo (actividades + balance)
 
-#### `!help`
-Muestra la lista de comandos disponibles.
-- **Uso**: `!help`
-- **Descripción**: Lista todos los comandos según permisos del usuario
+#### `!balance`
+Consulta tu balance semanal personal y estado de cuota.
+- **Uso**: `!balance`
+- **Descripción**: Muestra cuota restante, total aportado, contribuciones y estado
+- **Permisos**: Todos los usuarios
+- **Información mostrada**:
+  - Balance restante de $50,000
+  - Total aportado esta semana
+  - Número de contribuciones
+  - Estado de cuota (completada/pendiente)
+
+#### `!aportar [monto] [descripción]`
+Registra un aporte económico con imagen de evidencia.
+- **Uso**: `!aportar 10000 Abastecimiento restaurante La Cocina`
+- **Descripción**: Registra aporte con validación fotográfica
+- **Permisos**: Todos los usuarios
+- **Requiere**: Imagen adjunta como evidencia
+- **Sistema**: 50% descuenta de cuota, 50% ganancia personal
+
+#### `!actividades`
+Consulta tus actividades registradas.
+- **Uso**: `!actividades`
+- **Descripción**: Lista todas tus actividades por tipo
 - **Permisos**: Todos los usuarios
 
-### 🔧 Comandos Administrativos
+#### `!cancelar`
+Cancela un registro de actividad o aporte en progreso.
+- **Uso**: `!cancelar`
+- **Descripción**: Limpia datos temporales de registro pendiente
+- **Permisos**: Todos los usuarios
+
+### 🔧 Comandos Administrativos/Líderes
 
 #### `!config`
 Verifica la configuración completa del bot.
 - **Uso**: `!config`
-- **Descripción**: Muestra estado de todas las configuraciones
+- **Descripción**: Muestra estado de todas las configuraciones y canales
 - **Permisos**: Gestionar Mensajes
+- **Información mostrada**:
+  - Estado de canales configurados
+  - Verificación de roles
+  - Estado del sistema de eliminación automática
+  - Sistemas activos (registro, balance, recordatorios)
+
+#### `!balances`
+Ver resumen de todos los balances semanales.
+- **Uso**: `!balances`
+- **Descripción**: Panel administrativo con estadísticas completas
+- **Permisos**: Gestionar Mensajes
+- **Información mostrada**:
+  - Estadísticas generales (usuarios activos, cuotas completadas)
+  - Lista de usuarios con deuda pendiente
+  - Lista de usuarios con cuota completada
+  - Total aportado por todos los usuarios
 
 #### `!informe`
-Genera un reporte detallado de actividades.
+Genera un reporte manual de actividades y balances.
 - **Uso**: `!informe`
-- **Descripción**: Estadísticas completas de todos los usuarios
-- **Permisos**: Gestionar Mensajes
-- **Nota**: Los reportes también se generan automáticamente cada domingo
+- **Descripción**: Reporte completo con estadísticas integradas
+- **Permisos**: Gestionar Hilos
+- **Contenido**:
+  - Estadísticas de actividades
+  - Estadísticas de balances semanales
+  - Top 3 usuarios destacados
+  - Lista completa de usuarios activos
+
+#### `!limpiar-todo`
+Limpia TODOS los datos del sistema (IRREVERSIBLE).
+- **Uso**: `!limpiar-todo`
+- **Descripción**: Elimina todas las actividades, balances, hilos y configuraciones
+- **Permisos**: Administrador o Rol Líder
+- **Requiere**: Confirmación escribiendo "CONFIRMAR"
+- **Elimina**:
+  - Todos los hilos de actividades
+  - Todos los hilos de balance
+  - Todos los registros de actividades
+  - Todos los balances y aportes
+  - Todos los datos de usuarios
 
 #### `!crear-mensaje`
-Crea un mensaje persistente de registro en el canal configurado.
+Crea mensaje persistente en el canal de registro.
 - **Uso**: `!crear-mensaje`
-- **Descripción**: Genera el mensaje persistente con botones de actividades
+- **Descripción**: Genera/actualiza el mensaje con botones persistentes
 - **Permisos**: Gestionar Mensajes
 - **Nota**: Se verifica automáticamente cada 5 minutos
+
+#### `!test-canal`
+Verifica permisos del canal actual.
+- **Uso**: `!test-canal`
+- **Descripción**: Prueba que el bot pueda funcionar correctamente
+- **Permisos**: Gestionar Mensajes
+
+#### `!test-supervisor`
+Verifica configuración del rol supervisor.
+- **Uso**: `!test-supervisor`
+- **Descripción**: Confirma que el rol esté correctamente configurado
+- **Permisos**: Gestionar Mensajes
+
+### 🕒 Sistema de Recordatorios (Solo Administradores)
 
 #### `!listar-actividades`
 Muestra todas las actividades programadas del sistema.
 - **Uso**: `!listar-actividades`
-- **Descripción**: Lista actividades con horarios, días y estado
+- **Descripción**: Lista actividades con horarios, días y estado (activo/pausado)
 - **Permisos**: Gestionar Mensajes
 
 #### `!agregar-actividad`
 Agregar nueva actividad programada con recordatorio.
 - **Uso**: `!agregar-actividad "Nombre" "HH:MM" "días" "descripción"`
-- **Descripción**: Crea actividad con recordatorio automático
+- **Descripción**: Crea actividad con recordatorio automático 10 min antes
 - **Permisos**: Gestionar Mensajes
+- **Ejemplo**: `!agregar-actividad "Ronda Matutina" "08:00" "lunes,miércoles,viernes" "Patrullaje de seguridad"`
+
+#### `!recordatorios`
+Panel de gestión de recordatorios automáticos.
+- **Uso**: `!recordatorios`
+- **Descripción**: Interface para gestionar actividades programadas
+- **Permisos**: Gestionar Mensajes
+- **Funciones**: Activar/desactivar recordatorios, ver estadísticas
 - **Ejemplo**: `!agregar-actividad "Evento Especial" "15:30" "1,3,5" "Evento semanal"`
 
 #### `!recordatorios`
@@ -182,7 +304,143 @@ Elimina todos los datos y hilos del sistema.
 - **Permisos**: Administrador
 - **Confirmación**: Requiere escribir `CONFIRMAR` en 30 segundos
 
-## 📋 Sistema de Registro
+## � Sistema de Balances Semanales ✨ NUEVO
+
+### 📋 Descripción General
+
+El sistema de balances semanales es una funcionalidad avanzada que gestiona las contribuciones económicas de los miembros de Gunfighters. Cada miembro activo recibe una **cuota semanal de $50,000** que debe completar mediante aportes a la organización.
+
+### 🎯 Características Principales
+
+#### **💵 Cuota Semanal**
+- **Monto inicial**: $50,000 por miembro por semana
+- **Objetivo**: Llegar a $0 mediante aportes económicos
+- **Reset automático**: Cada domingo a las 23:59 UTC
+- **Seguimiento individual**: Hilo personal para cada usuario
+
+#### **📊 Distribución de Aportes**
+- **50% para la organización**: Se descuenta de la cuota semanal
+- **50% ganancia personal**: Beneficio del miembro
+- **Ejemplo**: Aporte de $10,000 → $5,000 para organización + $5,000 ganancia personal
+
+#### **🧵 Hilos Personalizados de Balance**
+- **Canal específico**: `BALANCE_THREADS_CHANNEL_ID`
+- **Creación automática**: Al primer aporte del usuario
+- **Contenido del hilo**:
+  - Registro detallado de cada aporte
+  - Evidencias fotográficas
+  - Historial de contribuciones
+  - Estado actual del balance
+
+### 🔄 Flujo de Trabajo
+
+#### **1. Registro de Aporte**
+```
+Usuario → Botón "💰 Aportar" → Modal Form → Imagen → Confirmación → Hilo
+```
+
+**Paso a paso:**
+1. Usuario presiona botón "💰 Aportar" en mensaje persistente
+2. Se abre formulario modal con campos:
+   - **Monto**: Cantidad del encargo en pesos
+   - **Descripción**: Detalle del trabajo realizado
+3. Usuario envía imagen como evidencia (5 minutos máximo)
+4. Sistema registra aporte y actualiza balance
+5. Se envía resumen al hilo personal de balance
+
+#### **2. Comando Alternativo**
+```bash
+!aportar [monto] [descripción]
+# Ejemplo: !aportar 15000 Abastecimiento eléctrico restaurante Central
+```
+
+### �📋 Comandos del Sistema de Balance
+
+#### **Para Usuarios**
+- `!balance` - Ver estado personal de cuota semanal
+- `!aportar [monto] [descripción]` - Registrar aporte con imagen
+
+#### **Para Administradores**
+- `!balances` - Resumen completo de todos los usuarios
+- `!limpiar-todo` - Incluye limpieza de datos de balance
+
+### 🔧 Configuración Técnica
+
+#### **Variables de Entorno**
+```env
+# Canal para hilos de balance (requerido)
+BALANCE_THREADS_CHANNEL_ID=1422420592052797503
+
+# Canal para informes de reset semanal
+REPORTS_CHANNEL_ID=1422420535974826054
+```
+
+#### **Estructura de Datos**
+```json
+{
+  "settings": {
+    "initialBalance": 50000,
+    "organizationPercentage": 50,
+    "resetDay": 0,
+    "resetHour": 23,
+    "resetMinute": 59
+  },
+  "users": {
+    "userId": {
+      "currentBalance": 25000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "unique_id",
+            "amount": 25000,
+            "organizationAmount": 12500,
+            "memberAmount": 12500,
+            "description": "Trabajo específico",
+            "photoUrl": "imagen_evidencia",
+            "timestamp": "2025-10-05T20:00:00Z"
+          }
+        ]
+      },
+      "balanceThreadId": "thread_id_aquí"
+    }
+  }
+}
+```
+
+### 📊 Reportes e Integración
+
+#### **Informes Semanales**
+Los balances se integran completamente en los reportes automáticos semanales:
+- **Estadísticas generales**: Total aportado, cuotas completadas/pendientes
+- **Top usuarios**: Incluye estado de cuota en medallas
+- **Listado completo**: Cada usuario muestra balance además de actividades
+
+#### **Reset Semanal Automático**
+- **Cuándo**: Cada domingo a las 23:59 UTC
+- **Proceso**:
+  1. Se resetean todos los balances a $50,000
+  2. Se archivan contribuciones de la semana anterior
+  3. Se envía notificación al canal de informes
+  4. Se actualiza clave de semana del sistema
+
+### 🎨 Interfaz de Usuario
+
+#### **Mensaje Persistente**
+Botón dedicado "💰 Aportar" que abre un formulario modal moderno con:
+- Campo numérico para monto
+- Campo de texto largo para descripción
+- Validación automática de datos
+- Interfaz responsive y fácil de usar
+
+#### **Consulta de Estado**
+Integrado en el botón "📊 Consultar Actividades":
+- Balance restante de la cuota
+- Total aportado esta semana
+- Estado de la cuota (completada/pendiente)
+- Número de contribuciones realizadas
+- Información de la semana actual
+
+## 📋 Sistema de Registro de Actividades
 
 ### 🎯 Actividades Disponibles
 
@@ -236,9 +494,122 @@ Los usuarios pueden consultar su progreso usando el botón **"📊 Consultar Mis
 - **Auto-expiración**: Los registros pendientes expiran automáticamente
 - **Confirmaciones temporales**: Los mensajes de confirmación se eliminan en 25 segundos
 
-## 🧵 Sistema de Hilos
+## 🧵 Sistema de Hilos Duales ✨ ACTUALIZADO
 
-### � Funcionamiento Automático
+### 📋 Descripción General
+
+Gunfighters Bot implementa un **sistema de hilos dual** que proporciona seguimiento separado y organizado para cada usuario:
+
+1. **🎯 Hilos de Actividades** - Para trabajos y tareas tradicionales
+2. **💰 Hilos de Balance** - Para aportes económicos y contribuciones
+
+### 🎯 Hilos de Actividades
+
+#### **📍 Ubicación y Configuración**
+- **Canal**: `THREADS_CHANNEL_ID` (ej: #log-actividades)
+- **Formato del nombre**: `🎯 [Nombre de Usuario] - Actividades`
+- **Creación**: Automática al primer registro de actividad
+- **Duración**: 7 días de archivo automático
+
+#### **📋 Contenido del Hilo**
+- **Mensaje de bienvenida**: Información sobre el sistema de actividades
+- **Registros de actividades**: Cada actividad registrada con detalles completos
+- **Evidencias fotográficas**: Imágenes reenviadas automáticamente
+- **Estadísticas**: Progreso y contadores actualizados
+
+#### **🔄 Flujo de Trabajo**
+```
+Actividad → Validación → Registro → Hilo de Actividades → Confirmación
+```
+
+### 💰 Hilos de Balance ✨ NUEVO
+
+#### **📍 Ubicación y Configuración**
+- **Canal**: `BALANCE_THREADS_CHANNEL_ID` (ej: #hilos-balance)
+- **Formato del nombre**: `💰 [Nombre de Usuario] - Aportes`
+- **Creación**: Automática al primer aporte económico
+- **Duración**: 7 días de archivo automático
+
+#### **📋 Contenido del Hilo**
+- **Mensaje de bienvenida**: Información sobre el sistema de balances
+- **Registros de aportes**: Cada contribución con detalles financieros
+- **Evidencias**: Imágenes de trabajos realizados y pagos
+- **Estado del balance**: Cuota restante y progreso semanal
+- **Historial**: Contribuciones anteriores organizadas por semana
+
+#### **🔄 Flujo de Trabajo**
+```
+Aporte → Modal/Comando → Validación → Registro → Hilo de Balance → Actualización Cuota
+```
+
+### 🛠️ Gestión Automática de Hilos
+
+#### **🔧 Creación Inteligente**
+- **Verificación de existencia**: Antes de crear, verifica si ya existe
+- **Reutilización**: Si existe un hilo archivado, lo reactiva
+- **Nombres únicos**: Basados en el nombre de usuario en el servidor
+- **Permisos**: Configuración automática para acceso correcto
+
+#### **👥 Notificaciones a Supervisores**
+Al crear hilos nuevos:
+1. **Mensaje de notificación**: Etiqueta al rol supervisor configurado
+2. **Información del usuario**: Nombre y propósito del hilo
+3. **Auto-eliminación**: La notificación se elimina después de 5 segundos
+4. **Solo nuevos**: No notifica en hilos reutilizados
+
+#### **🗂️ Organización por Canales**
+```
+Discord Server
+├── #log-actividades (THREADS_CHANNEL_ID)
+│   ├── 🎯 Usuario1 - Actividades
+│   ├── 🎯 Usuario2 - Actividades
+│   └── 🎯 Usuario3 - Actividades
+└── #hilos-balance (BALANCE_THREADS_CHANNEL_ID)
+    ├── 💰 Usuario1 - Aportes
+    ├── 💰 Usuario2 - Aportes
+    └── 💰 Usuario3 - Aportes
+```
+
+### 📊 Ventajas del Sistema Dual
+
+#### **🎯 Para Actividades Tradicionales**
+- **Seguimiento específico**: Solo actividades de trabajo
+- **Historial limpio**: Fácil revisión de tareas completadas
+- **Evidencias organizadas**: Imágenes y confirmaciones centralizadas
+- **Estadísticas claras**: Progreso por tipo de actividad
+
+#### **💰 Para Aportes Económicos**
+- **Control financiero**: Seguimiento de contribuciones monetarias
+- **Transparencia**: Historial completo de aportes
+- **Balance en tiempo real**: Estado actual de cuota semanal
+- **Evidencias económicas**: Pruebas de trabajos pagados
+
+#### **🔄 Integración Sistémica**
+- **Reportes completos**: Ambos sistemas en informes semanales
+- **Consulta unificada**: Botón de consulta muestra ambos estados
+- **Limpieza coordinada**: `!limpiar-todo` maneja ambos tipos de hilos
+- **Configuración separada**: Canales independientes para mejor organización
+
+### 🔧 Configuración Técnica
+
+#### **Variables Requeridas**
+```env
+# Hilos de actividades tradicionales
+THREADS_CHANNEL_ID=tu_canal_actividades
+
+# Hilos de aportes económicos (NUEVO)
+BALANCE_THREADS_CHANNEL_ID=tu_canal_balance
+
+# Rol para notificaciones (opcional)
+SUPERVISOR_ROLE_ID=tu_rol_supervisor
+```
+
+#### **Permisos de Canal Necesarios**
+- **Crear hilos públicos**
+- **Gestionar hilos**
+- **Enviar mensajes**
+- **Adjuntar archivos** (para imágenes)
+- **Usar emojis externos**
 
 - **Creación automática**: Se crea un hilo personal al primer registro de actividad
 - **Reutilización inteligente**: Si el hilo existe, se reutiliza
@@ -557,10 +928,10 @@ Semana del 2024-W50
 🥉 Usuario3: 7 actividades (Balance: ✅ Completado)
 ```
 
-## �🗃️ Base de Datos
+## 🗃️ Base de Datos
 
 ### 📄 activities.json
-Almacena todos los registros de actividades:
+Almacena todos los registros de actividades tradicionales:
 ```json
 [
   {
@@ -574,16 +945,57 @@ Almacena todos los registros de actividades:
 ]
 ```
 
+### 📄 balances.json ✨ NUEVO
+Gestiona el sistema de balances semanales y aportes económicos:
+```json
+{
+  "settings": {
+    "initialBalance": 50000,
+    "organizationPercentage": 50,
+    "resetDay": 0,
+    "resetHour": 23,
+    "resetMinute": 59,
+    "lastResetDate": "2025-10-05"
+  },
+  "users": {
+    "123456789": {
+      "currentBalance": 25000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "contrib_1728158400_123456789",
+            "amount": 25000,
+            "organizationAmount": 12500,
+            "memberAmount": 12500,
+            "description": "Abastecimiento eléctrico restaurante",
+            "photoUrl": "https://cdn.discordapp.com/attachments/...",
+            "timestamp": "2025-10-05T20:00:00.000Z"
+          }
+        ]
+      },
+      "totalContributed": 12500,
+      "lastActivity": "2025-10-05T20:00:00.000Z",
+      "balanceThreadId": "1422420000000000000"
+    }
+  },
+  "weeklyResets": {
+    "2025-W41": "2025-10-06T23:59:00.000Z"
+  }
+}
+```
+
 ### 📄 threads.json
-Mapea usuarios a sus hilos correspondientes:
+Mapea usuarios a sus hilos de actividades correspondientes:
 ```json
 {
   "123456789": "987654321"
 }
 ```
 
+**Nota**: Los hilos de balance se almacenan dentro de `balances.json` en el campo `balanceThreadId` de cada usuario.
+
 ### 📄 weeklyReports.json
-Guarda los reportes semanales generados:
+Guarda los reportes semanales generados con información integrada:
 ```json
 [
   {
@@ -597,6 +1009,12 @@ Guarda los reportes semanales generados:
         "count": 5
       }
     ],
+    "balanceStats": {
+      "totalOrganizationAmount": 125000,
+      "completedQuotas": 3,
+      "pendingQuotas": 2,
+      "contributionsCount": 8
+    },
     "generatedAt": "2024-03-17T23:59:00.000Z"
   }
 ]
