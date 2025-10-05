@@ -28,15 +28,36 @@ function loadData() {
         }
         
         const data = fs.readFileSync(dataPath, 'utf8');
-        return JSON.parse(data);
+        const parsedData = JSON.parse(data);
+        
+        // Verificar que la estructura es válida
+        if (!parsedData || typeof parsedData !== 'object') {
+            throw new Error('Invalid data structure');
+        }
+        
+        // Asegurar que las propiedades básicas existen
+        if (!parsedData.users) parsedData.users = {};
+        if (!parsedData.weeklyReports) parsedData.weeklyReports = {};
+        if (!parsedData.pendingRegistrations) parsedData.pendingRegistrations = {};
+        if (!parsedData.currentWeek) parsedData.currentWeek = getCurrentWeek();
+        
+        return parsedData;
     } catch (error) {
-        console.error('Error cargando datos:', error);
-        return {
+        console.error('Error cargando datos, recreando archivo:', error);
+        const fallbackData = {
             users: {},
             weeklyReports: {},
             currentWeek: getCurrentWeek(),
             pendingRegistrations: {}
         };
+        
+        try {
+            fs.writeFileSync(dataPath, JSON.stringify(fallbackData, null, 2));
+        } catch (writeError) {
+            console.error('Error escribiendo archivo de respaldo:', writeError);
+        }
+        
+        return fallbackData;
     }
 }
 
@@ -77,12 +98,22 @@ function registerActivity(userId, username, activityType, proofImages) {
     const data = loadData();
     const currentWeek = getCurrentWeek();
     
+    // Asegurar que la estructura básica existe
+    if (!data.users) {
+        data.users = {};
+    }
+    
     // Inicializar usuario si no existe
     if (!data.users[userId]) {
         data.users[userId] = {
             username: username,
             activities: {}
         };
+    }
+    
+    // Asegurar que activities existe
+    if (!data.users[userId].activities) {
+        data.users[userId].activities = {};
     }
     
     // Inicializar semana si no existe
@@ -118,7 +149,36 @@ function getUserActivities(userId) {
     const data = loadData();
     const currentWeek = getCurrentWeek();
     
-    if (!data.users[userId] || !data.users[userId].activities[currentWeek]) {
+    // Verificar si el usuario existe
+    if (!data.users[userId]) {
+        return {
+            limpieza_espacios: 0,
+            abastecimiento_electrico: 0,
+            asesoramiento_empresarial: 0,
+            jardineria: 0,
+            mantenimiento_gasolineras: 0,
+            limpieza_rascacielos: 0,
+            total: 0
+        };
+    }
+    
+    // Verificar si el usuario tiene actividades
+    if (!data.users[userId].activities) {
+        data.users[userId].activities = {};
+        saveData(data);
+        return {
+            limpieza_espacios: 0,
+            abastecimiento_electrico: 0,
+            asesoramiento_empresarial: 0,
+            jardineria: 0,
+            mantenimiento_gasolineras: 0,
+            limpieza_rascacielos: 0,
+            total: 0
+        };
+    }
+    
+    // Verificar si el usuario tiene actividades para la semana actual
+    if (!data.users[userId].activities[currentWeek]) {
         return {
             limpieza_espacios: 0,
             abastecimiento_electrico: 0,
@@ -152,6 +212,11 @@ function getUserActivities(userId) {
 function addPendingRegistration(userId, activityType) {
     const data = loadData();
     
+    // Asegurar que pendingRegistrations existe
+    if (!data.pendingRegistrations) {
+        data.pendingRegistrations = {};
+    }
+    
     // Verificar si ya existe un registro pendiente
     const existingPending = data.pendingRegistrations[userId];
     if (existingPending) {
@@ -181,6 +246,12 @@ function addPendingRegistration(userId, activityType) {
  */
 function forceReplacePendingRegistration(userId, activityType) {
     const data = loadData();
+    
+    // Asegurar que pendingRegistrations existe
+    if (!data.pendingRegistrations) {
+        data.pendingRegistrations = {};
+    }
+    
     data.pendingRegistrations[userId] = {
         activityType: activityType,
         timestamp: Date.now(),
@@ -194,6 +265,14 @@ function forceReplacePendingRegistration(userId, activityType) {
  */
 function getPendingRegistration(userId) {
     const data = loadData();
+    
+    // Asegurar que pendingRegistrations existe
+    if (!data.pendingRegistrations) {
+        data.pendingRegistrations = {};
+        saveData(data);
+        return null;
+    }
+    
     const pending = data.pendingRegistrations[userId];
     
     if (pending) {
@@ -211,6 +290,13 @@ function cleanExpiredRegistrations() {
     const data = loadData();
     const now = Date.now();
     const fiveMinutes = 5 * 60 * 1000;
+    
+    // Asegurar que pendingRegistrations existe
+    if (!data.pendingRegistrations) {
+        data.pendingRegistrations = {};
+        saveData(data);
+        return;
+    }
     
     for (const userId in data.pendingRegistrations) {
         if (now - data.pendingRegistrations[userId].timestamp > fiveMinutes) {

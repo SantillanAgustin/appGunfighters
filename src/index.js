@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { 
     registerActivity, 
     getUserActivities, 
@@ -43,7 +43,10 @@ const {
     getCurrentWeekKey,
     updateSettings,
     getSettings,
-    formatMoney
+    formatMoney,
+    saveUserBalanceThread,
+    getUserBalanceThread,
+    clearAllBalanceData
 } = require('./utils/balanceManager');
 
 // Crear el cliente del bot
@@ -95,9 +98,11 @@ async function generateAndSendWeeklyReport() {
             return;
         }
 
-        const threadsChannel = guild.channels.cache.get(process.env.THREADS_CHANNEL_ID);
-        if (!threadsChannel) {
-            console.error('❌ No se pudo encontrar el canal de hilos');
+        // Usar el canal específico para informes si está configurado, sino usar el canal de hilos
+        const reportsChannelId = process.env.REPORTS_CHANNEL_ID || process.env.THREADS_CHANNEL_ID;
+        const reportsChannel = guild.channels.cache.get(reportsChannelId);
+        if (!reportsChannel) {
+            console.error('❌ No se pudo encontrar el canal de informes');
             return;
         }
 
@@ -112,7 +117,7 @@ async function generateAndSendWeeklyReport() {
         const embed = formatWeeklyReport(report);
         
         // Enviar el informe
-        await threadsChannel.send({
+        await reportsChannel.send({
             content: '📊 **INFORME SEMANAL DE ACTIVIDADES**\n\n' + 
                     `<@&${process.env.SUPERVISOR_ROLE_ID}> El informe semanal está listo:`,
             embeds: [embed]
@@ -226,7 +231,11 @@ async function createPersistentRegisterMessage() {
                 new ButtonBuilder()
                     .setCustomId('persistent_consultar_actividades')
                     .setLabel('📊 Consultar Mis Actividades')
-                    .setStyle(ButtonStyle.Primary)
+                    .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                    .setCustomId('persistent_aportar')
+                    .setLabel('💰 Realizar Aporte')
+                    .setStyle(ButtonStyle.Secondary)
             );
 
         // Enviar el mensaje
@@ -533,6 +542,100 @@ async function getOrCreateUserThread(member, originalChannel) {
     }
 }
 
+/**
+ * Crear o obtener hilo de balance para un usuario
+ */
+async function getOrCreateUserBalanceThread(member, originalChannel) {
+    const existingThreadId = getUserBalanceThread(member.id);
+    
+    // Obtener el nombre a mostrar (nickname del servidor o nombre de usuario)
+    const displayName = member.displayName || member.user.username;
+    
+    // Determinar el canal donde crear hilos de balance
+    let balanceThreadsChannel = originalChannel;
+    if (process.env.BALANCE_THREADS_CHANNEL_ID) {
+        try {
+            balanceThreadsChannel = await originalChannel.guild.channels.fetch(process.env.BALANCE_THREADS_CHANNEL_ID);
+            console.log(`✅ Usando canal específico para hilos de balance: ${balanceThreadsChannel.name}`);
+        } catch (error) {
+            console.log('⚠️ Canal de hilos de balance específico no encontrado, usando canal actual');
+            balanceThreadsChannel = originalChannel;
+        }
+    } else {
+        console.log('📝 No hay canal específico para balance configurado, usando canal actual');
+    }
+    
+    // Verificar si el hilo existe y está accesible
+    if (existingThreadId) {
+        try {
+            const existingThread = await balanceThreadsChannel.threads.fetch(existingThreadId);
+            if (existingThread && !existingThread.archived) {
+                console.log(`🔄 Reutilizando hilo de balance existente: ${existingThread.name}`);
+                return existingThread;
+            }
+        } catch (error) {
+            console.log(`🗑️ Hilo de balance ${existingThreadId} no encontrado o inaccesible, creando uno nuevo`);
+        }
+    }
+    
+    // Crear nuevo hilo de balance
+    try {
+        console.log(`💰 Creando nuevo hilo de balance para ${displayName} en #${balanceThreadsChannel.name}`);
+        
+        const thread = await balanceThreadsChannel.threads.create({
+            name: `💰 ${displayName} - Aportes`,
+            autoArchiveDuration: 10080, // 7 días
+            reason: `Hilo automático para registro de aportes de ${displayName}`
+        });
+        
+        // Guardar el ID del hilo
+        saveUserBalanceThread(member.id, thread.id);
+        console.log(`✅ Hilo de balance creado exitosamente: ${thread.name} (ID: ${thread.id})`);
+        
+        // Mensaje de bienvenida al hilo
+        const welcomeEmbed = new EmbedBuilder()
+            .setColor(0x00ff00)
+            .setTitle(`💰 Hilo de Aportes - ${displayName}`)
+            .setDescription('Este es tu hilo personal para el registro de aportes económicos de Gunfighters.\n\n**Aquí se registrarán automáticamente:**\n• Todos tus aportes a la organización\n• Evidencias fotográficas\n• Detalles de montos y descripciones\n• Historial de contribuciones\n\n¡Excelente trabajo aportando a la organización! 💪')
+            .setThumbnail(member.user.displayAvatarURL())
+            .setFooter({ text: 'Gunfighters - Sistema de Balances' })
+            .setTimestamp();
+        
+        // Enviar mensaje de bienvenida
+        await thread.send({ embeds: [welcomeEmbed] });
+        
+        // Etiquetar al rol supervisor si está configurado
+        if (process.env.SUPERVISOR_ROLE_ID) {
+            try {
+                const supervisorRole = await balanceThreadsChannel.guild.roles.fetch(process.env.SUPERVISOR_ROLE_ID);
+                if (supervisorRole) {
+                    // Etiquetar el rol en el hilo
+                    const supervisorMessage = await thread.send({
+                        content: `${supervisorRole} 💰 **Nuevo colaborador en aportes**\n\n📋 Se ha creado un hilo de aportes para **${displayName}**\n🔔 Serás notificado de todas las contribuciones económicas registradas aquí`,
+                        allowedMentions: { roles: [process.env.SUPERVISOR_ROLE_ID] }
+                    });
+                    
+                    // Eliminar la mención después de un momento para que no quede visible
+                    setTimeout(async () => {
+                        try {
+                            await supervisorMessage.delete();
+                        } catch (error) {
+                            console.log('⚠️ No se pudo eliminar mensaje de supervisor en hilo de balance');
+                        }
+                    }, 5000);
+                }
+            } catch (error) {
+                console.error('❌ Error al etiquetar rol supervisor en hilo de balance:', error);
+            }
+        }
+        
+        return thread;
+    } catch (error) {
+        console.error('❌ Error creando hilo de balance:', error);
+        return null;
+    }
+}
+
 // Evento cuando el bot está listo
 client.once('clientReady', async () => {
     console.log(`${client.user.tag} está online!`);
@@ -640,6 +743,143 @@ client.on('messageCreate', async message => {
         return;
     }
 
+    // Verificar si hay un aporte pendiente y el mensaje contiene fotos
+    const { loadData, saveData } = require('./utils/activityManager');
+    const data = loadData();
+    const pendingAporte = data.pendingAportes && data.pendingAportes[message.author.id];
+    
+    if (pendingAporte && message.attachments.size > 0) {
+        const photos = Array.from(message.attachments.values());
+        
+        if (photos.length === 1) {
+            try {
+                // Obtener URL de la imagen
+                const photoUrl = photos[0].url;
+                const settings = getSettings();
+                const organizationAmount = Math.floor(pendingAporte.monto * (settings.organizationPercentage / 100));
+                const memberAmount = pendingAporte.monto - organizationAmount;
+
+                // Registrar la contribución
+                const contribution = registerContribution(
+                    message.author.id,
+                    message.author.username,
+                    message.member.displayName || message.author.username,
+                    pendingAporte.monto,
+                    pendingAporte.descripcion,
+                    photoUrl
+                );
+
+                if (contribution) {
+                    // Limpiar el aporte pendiente
+                    delete data.pendingAportes[message.author.id];
+                    saveData(data);
+                    
+                    // Obtener balance actualizado
+                    const userBalance = getUserBalance(message.author.id);
+                    
+                    const embed = new EmbedBuilder()
+                        .setColor(0x00ff00)
+                        .setTitle('✅ Aporte Registrado Exitosamente')
+                        .setDescription(`**${message.member.displayName || message.author.username}**`)
+                        .addFields([
+                            {
+                                name: '💵 Monto Total del Encargo',
+                                value: formatMoney(pendingAporte.monto),
+                                inline: true
+                            },
+                            {
+                                name: '🏢 Aporte a la Organización',
+                                value: formatMoney(organizationAmount),
+                                inline: true
+                            },
+                            {
+                                name: '👤 Tu Ganancia',
+                                value: formatMoney(memberAmount),
+                                inline: true
+                            },
+                            {
+                                name: '💰 Balance Restante',
+                                value: formatMoney(userBalance.currentBalance),
+                                inline: true
+                            },
+                            {
+                                name: '🎯 Estado de Cuota',
+                                value: userBalance.currentBalance === 0 ? '✅ Completada' : '⏳ Pendiente',
+                                inline: true
+                            },
+                            {
+                                name: '📝 Descripción',
+                                value: pendingAporte.descripcion,
+                                inline: false
+                            }
+                        ])
+                        .setImage(photoUrl)
+                        .setFooter({ text: `ID: ${contribution.id} | Gunfighters - Sistema de Balances` })
+                        .setTimestamp();
+
+                    const confirmMessage = await message.reply({ embeds: [embed] });
+
+                    // Enviar registro al hilo personal de balance del usuario
+                    const userBalanceThread = await getOrCreateUserBalanceThread(message.member, message.channel);
+                    if (userBalanceThread) {
+                        const threadEmbed = new EmbedBuilder()
+                            .setColor(0x00ff00)
+                            .setTitle('💰 Aporte Registrado')
+                            .setDescription(`**Contribución económica registrada exitosamente**\n\n📅 Fecha: <t:${Math.floor(Date.now() / 1000)}:F>\n💵 Monto: ${formatMoney(pendingAporte.monto)}\n🏢 Aporte a organización: ${formatMoney(organizationAmount)}\n👤 Ganancia personal: ${formatMoney(memberAmount)}\n📝 Descripción: ${pendingAporte.descripcion}`)
+                            .addFields([
+                                {
+                                    name: '💰 Estado del Balance',
+                                    value: `**Balance restante:** ${formatMoney(userBalance.currentBalance)}\n**Estado de cuota:** ${userBalance.currentBalance === 0 ? '✅ Completada' : '⏳ Pendiente'}`,
+                                    inline: false
+                                }
+                            ])
+                            .setFooter({ text: `ID: ${contribution.id} | Registro de aporte` })
+                            .setTimestamp();
+                        
+                        // Enviar embed al hilo
+                        await userBalanceThread.send({ embeds: [threadEmbed] });
+                        
+                        // Reenviar la imagen al hilo
+                        await userBalanceThread.send({ 
+                            content: `📸 Evidencia del aporte: ${pendingAporte.descripcion}`,
+                            files: [photoUrl]
+                        });
+                    }
+
+                    // Auto-eliminar confirmación después de 30 segundos
+                    setTimeout(async () => {
+                        try {
+                            await confirmMessage.delete();
+                            console.log(`🗑️ Confirmación eliminada para ${message.author.tag}`);
+                        } catch (error) {
+                            console.log(`⚠️ No se pudo eliminar confirmación de aporte: ${error.message}`);
+                        }
+                    }, 30000);
+
+                    // Auto-eliminar la imagen original si está configurado
+                    if (process.env.AUTO_DELETE_PHOTOS === 'true') {
+                        setTimeout(async () => {
+                            try {
+                                await message.delete();
+                                console.log(`🧹 Mensaje con imagen de aporte eliminado automáticamente de ${message.author.tag}`);
+                            } catch (error) {
+                                console.log(`⚠️ No se pudo eliminar imagen de aporte: ${error.message}`);
+                            }
+                        }, 35000);
+                    }
+                } else {
+                    await message.reply('❌ Error al registrar el aporte. Inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('❌ Error procesando aporte:', error);
+                await message.reply('❌ Error al procesar el aporte. Inténtalo de nuevo.');
+            }
+        } else {
+            await message.reply(`❌ Se requiere exactamente 1 imagen para el aporte. Enviaste ${photos.length}. Inténtalo de nuevo.`);
+        }
+        return;
+    }
+
     const prefix = process.env.PREFIX || '!';
     
     // Verificar si el mensaje comienza con el prefijo
@@ -692,6 +932,19 @@ client.on('messageCreate', async message => {
             channelStatus = `⚠️ No configurado (usa canal actual)`;
         }
         
+        // Verificar canal de hilos de balance
+        let balanceChannelStatus = '';
+        if (process.env.BALANCE_THREADS_CHANNEL_ID) {
+            try {
+                const balanceThreadsChannel = await message.guild.channels.fetch(process.env.BALANCE_THREADS_CHANNEL_ID);
+                balanceChannelStatus = `✅ **${balanceThreadsChannel.name}**`;
+            } catch (error) {
+                balanceChannelStatus = `❌ Canal no encontrado`;
+            }
+        } else {
+            balanceChannelStatus = `⚠️ No configurado (usa canal actual)`;
+        }
+        
         // Verificar rol supervisor
         let roleStatus = '';
         if (process.env.SUPERVISOR_ROLE_ID) {
@@ -714,8 +967,13 @@ client.on('messageCreate', async message => {
             .setDescription('Estado actual de todas las configuraciones:')
             .addFields([
                 {
-                    name: '🧵 Canal de Hilos',
+                    name: '🧵 Canal de Hilos (Actividades)',
                     value: channelStatus,
+                    inline: true
+                },
+                {
+                    name: '💰 Canal de Hilos (Balances)',
+                    value: balanceChannelStatus,
                     inline: true
                 },
                 {
@@ -731,7 +989,12 @@ client.on('messageCreate', async message => {
                 {
                     name: '📊 Sistema de Registro',
                     value: '✅ **Funcionando**\n6 actividades disponibles',
-                    inline: false
+                    inline: true
+                },
+                {
+                    name: '💰 Sistema de Balances',
+                    value: '✅ **Funcionando**\nAportes con hilos automáticos',
+                    inline: true
                 },
                 {
                     name: '🔧 Comandos Adicionales',
@@ -758,7 +1021,7 @@ client.on('messageCreate', async message => {
         const confirmEmbed = new EmbedBuilder()
             .setColor(0xff0000)
             .setTitle('⚠️ ADVERTENCIA: Limpieza Total')
-            .setDescription('**Este comando eliminará:**\n\n🗑️ Todos los hilos de actividades existentes\n📊 Todos los registros de actividades\n👥 Todos los datos de usuarios\n\n**Esta acción NO se puede deshacer.**')
+            .setDescription('**Este comando eliminará:**\n\n🗑️ Todos los hilos de actividades existentes\n� Todos los hilos de balance existentes\n�📊 Todos los registros de actividades\n💸 Todos los balances y aportes monetarios\n👥 Todos los datos de usuarios\n\n**Esta acción NO se puede deshacer.**')
             .addFields([
                 {
                     name: '🔴 Para confirmar:',
@@ -824,15 +1087,57 @@ client.on('messageCreate', async message => {
                         errors.push(`Canal no encontrado: ${error.message}`);
                     }
                 }
+
+                // Eliminar hilos de balance
+                if (process.env.BALANCE_THREADS_CHANNEL_ID) {
+                    try {
+                        const balanceThreadsChannel = await message.guild.channels.fetch(process.env.BALANCE_THREADS_CHANNEL_ID);
+                        
+                        // Obtener hilos activos y archivados de balance
+                        const activeBalanceThreads = await balanceThreadsChannel.threads.fetchActive();
+                        const archivedBalanceThreads = await balanceThreadsChannel.threads.fetchArchived();
+                        
+                        // Eliminar hilos activos de balance
+                        for (const [threadId, thread] of activeBalanceThreads.threads) {
+                            try {
+                                await thread.delete('Limpieza administrativa');
+                                deletedThreadsCount++;
+                                console.log(`💰 Hilo de balance eliminado: ${thread.name} (${threadId})`);
+                            } catch (error) {
+                                errors.push(`Hilo balance ${thread.name}: ${error.message}`);
+                                console.error(`❌ Error eliminando hilo de balance ${threadId}:`, error);
+                            }
+                        }
+                        
+                        // Eliminar hilos archivados de balance
+                        for (const [threadId, thread] of archivedBalanceThreads.threads) {
+                            try {
+                                await thread.delete('Limpieza administrativa');
+                                deletedThreadsCount++;
+                                console.log(`💰 Hilo de balance archivado eliminado: ${thread.name} (${threadId})`);
+                            } catch (error) {
+                                errors.push(`Hilo balance archivado ${thread.name}: ${error.message}`);
+                                console.error(`❌ Error eliminando hilo de balance archivado ${threadId}:`, error);
+                            }
+                        }
+                        
+                    } catch (error) {
+                        errors.push(`Canal de balance no encontrado: ${error.message}`);
+                        console.error('❌ Error accediendo al canal de balance:', error);
+                    }
+                }
                 
                 // Limpiar datos del archivo
                 const dataCleared = clearAllData();
                 
+                // Limpiar todos los datos de balance
+                const balanceDataCleared = clearAllBalanceData();
+                
                 // Reporte final
                 const resultEmbed = new EmbedBuilder()
-                    .setColor(dataCleared && errors.length === 0 ? 0x00ff00 : 0xffa500)
+                    .setColor(dataCleared && balanceDataCleared && errors.length === 0 ? 0x00ff00 : 0xffa500)
                     .setTitle('✅ Limpieza Completada')
-                    .setDescription(`**Resultados de la limpieza:**\n\n🗑️ Hilos eliminados: ${deletedThreadsCount}\n📊 Datos limpiados: ${dataCleared ? 'Sí' : 'Error'}\n❌ Errores: ${errors.length}`)
+                    .setDescription(`**Resultados de la limpieza:**\n\n🗑️ Hilos eliminados: ${deletedThreadsCount}\n📊 Datos de actividades limpiados: ${dataCleared ? 'Sí' : 'Error'}\n💸 Datos de balance limpiados: ${balanceDataCleared ? 'Sí' : 'Error'}\n❌ Errores: ${errors.length}`)
                     .setFooter({ text: 'Gunfighters - Limpieza Completada' })
                     .setTimestamp();
                 
@@ -1390,6 +1695,33 @@ client.on('messageCreate', async message => {
 
                 const confirmMessage = await message.reply({ embeds: [embed] });
 
+                // Enviar registro al hilo personal de balance del usuario
+                const userBalanceThread = await getOrCreateUserBalanceThread(message.member, message.channel);
+                if (userBalanceThread) {
+                    const threadEmbed = new EmbedBuilder()
+                        .setColor(0x00ff00)
+                        .setTitle('💰 Aporte Registrado')
+                        .setDescription(`**Contribución económica registrada exitosamente**\n\n📅 Fecha: <t:${Math.floor(Date.now() / 1000)}:F>\n💵 Monto: ${formatMoney(amount)}\n🏢 Aporte a organización: ${formatMoney(organizationAmount)}\n👤 Ganancia personal: ${formatMoney(memberAmount)}\n📝 Descripción: ${description}`)
+                        .addFields([
+                            {
+                                name: '💰 Estado del Balance',
+                                value: `**Balance restante:** ${formatMoney(userBalance.currentBalance)}\n**Estado de cuota:** ${userBalance.currentBalance === 0 ? '✅ Completada' : '⏳ Pendiente'}`,
+                                inline: false
+                            }
+                        ])
+                        .setFooter({ text: `ID: ${contribution.id} | Registro de aporte` })
+                        .setTimestamp();
+                    
+                    // Enviar embed al hilo
+                    await userBalanceThread.send({ embeds: [threadEmbed] });
+                    
+                    // Reenviar la imagen al hilo
+                    await userBalanceThread.send({ 
+                        content: `📸 Evidencia del aporte: ${description}`,
+                        files: [photoUrl]
+                    });
+                }
+
                 // Auto-eliminar confirmación después de 30 segundos
                 setTimeout(async () => {
                     try {
@@ -1599,12 +1931,107 @@ client.on('messageCreate', async message => {
 
 // Evento para manejar interacciones de botones
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isButton()) return;
+    if (!interaction.isButton() && !interaction.isModalSubmit()) return;
 
     // Verificar servidor autorizado
     if (interaction.guild?.id !== process.env.GUILD_ID) return;
 
     try {
+        // Manejar envío de modal de aporte
+        if (interaction.isModalSubmit() && interaction.customId === 'aportar_modal') {
+            const monto = interaction.fields.getTextInputValue('monto_input');
+            const descripcion = interaction.fields.getTextInputValue('descripcion_input');
+            
+            // Validar monto
+            const amount = parseInt(monto);
+            if (isNaN(amount) || amount <= 0) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(0xff0000)
+                    .setTitle('❌ Monto Inválido')
+                    .setDescription('El monto debe ser un número válido mayor a 0.')
+                    .addFields([
+                        {
+                            name: '💡 Ejemplo correcto:',
+                            value: '`10000` (sin puntos, comas ni símbolos)',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+                    
+                return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+            }
+            
+            // Validar descripción
+            if (descripcion.length < 5) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(0xff0000)
+                    .setTitle('❌ Descripción Muy Corta')
+                    .setDescription('La descripción debe tener al menos 5 caracteres.')
+                    .addFields([
+                        {
+                            name: '💡 Ejemplo:',
+                            value: 'Abastecimiento eléctrico en restaurante La Cocina',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+                    
+                return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+            }
+            
+            // Guardar datos temporalmente y pedir imagen
+            const pendingAporte = {
+                userId: interaction.user.id,
+                monto: amount,
+                descripcion: descripcion,
+                timestamp: Date.now()
+            };
+            
+            // Guardar en una estructura temporal (usando el mismo sistema que las actividades)
+            const data = require('./utils/activityManager').loadData();
+            if (!data.pendingAportes) {
+                data.pendingAportes = {};
+            }
+            data.pendingAportes[interaction.user.id] = pendingAporte;
+            require('./utils/activityManager').saveData(data);
+            
+            const settings = getSettings();
+            const organizationAmount = Math.floor(amount * (settings.organizationPercentage / 100));
+            const memberAmount = amount - organizationAmount;
+            
+            const embed = new EmbedBuilder()
+                .setColor(0xffa500)
+                .setTitle('📸 Aporte Registrado - Envía la Imagen')
+                .setDescription(`**Información del aporte:**\n\n**💵 Monto:** ${formatMoney(amount)}\n**📝 Descripción:** ${descripcion}\n\n**💰 Distribución:**\n🏢 Para la organización: ${formatMoney(organizationAmount)}\n👤 Tu ganancia: ${formatMoney(memberAmount)}`)
+                .addFields([
+                    {
+                        name: '📸 Próximo paso:',
+                        value: '**Envía UNA imagen** como evidencia del trabajo realizado y el pago recibido en este canal.',
+                        inline: false
+                    },
+                    {
+                        name: '⏰ Tiempo límite:',
+                        value: 'Tienes **5 minutos** para enviar la imagen.',
+                        inline: false
+                    }
+                ])
+                .setFooter({ text: 'Gunfighters - Sistema de Aportes' })
+                .setTimestamp();
+                
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+            
+            // Limpiar datos temporales después de 5 minutos
+            setTimeout(() => {
+                const currentData = require('./utils/activityManager').loadData();
+                if (currentData.pendingAportes && currentData.pendingAportes[interaction.user.id]) {
+                    delete currentData.pendingAportes[interaction.user.id];
+                    require('./utils/activityManager').saveData(currentData);
+                }
+            }, 5 * 60 * 1000);
+            
+            return;
+        }
+
         if (interaction.customId === 'registrar_actividad') {
             const embed = new EmbedBuilder()
                 .setColor(0x00ff00)
@@ -1679,37 +2106,137 @@ client.on('interactionCreate', async interaction => {
         // Manejar botones del mensaje persistente
         if (interaction.customId.startsWith('persistent_')) {
             if (interaction.customId === 'persistent_consultar_actividades') {
-                const activities = getUserActivities(interaction.user.id);
-                const userBalance = getUserBalance(interaction.user.id);
-                const currentWeek = getCurrentWeekKey();
-                const weeklyContributions = userBalance.weeklyContributions[currentWeek] || [];
-                const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
-                
-                const embed = new EmbedBuilder()
-                    .setColor(userBalance.currentBalance === 0 ? 0x00ff00 : userBalance.currentBalance < 25000 ? 0xffa500 : 0xff0000)
-                    .setTitle('📊 Tus Actividades y Balance Esta Semana')
-                    .setDescription(`**${interaction.member.displayName || interaction.user.username}**\n\n**🎯 Actividades registradas:**\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**📊 Total actividades: ${activities.total}**`)
-                    .addFields([
-                        {
-                            name: '💰 Balance Semanal',
-                            value: `**Restante:** ${formatMoney(userBalance.currentBalance)}\n**Aportado:** ${formatMoney(weeklyTotal)}`,
-                            inline: true
-                        },
-                        {
-                            name: '🎯 Estado de Cuota',
-                            value: userBalance.currentBalance === 0 ? '✅ **Completada**' : '⏳ **Pendiente**',
-                            inline: true
-                        },
-                        {
-                            name: '📋 Contribuciones',
-                            value: `**${weeklyContributions.length}** aportes realizados\n**Semana:** ${currentWeek}`,
-                            inline: true
-                        }
-                    ])
-                    .setFooter({ text: 'Los datos se reinician cada domingo a las 23:59 UTC | Usa !aportar para registrar contribuciones' })
-                    .setTimestamp();
+                try {
+                    const activities = getUserActivities(interaction.user.id);
+                    const userBalance = getUserBalance(interaction.user.id);
+                    const currentWeek = getCurrentWeekKey();
+                    const weeklyContributions = userBalance.weeklyContributions[currentWeek] || [];
+                    const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
+                    
+                    // Verificar si es un usuario nuevo (sin actividades ni contribuciones)
+                    const isNewUser = activities.total === 0 && weeklyContributions.length === 0;
+                    
+                    const displayName = interaction.member?.displayName || interaction.user.username;
+                    
+                    const embed = new EmbedBuilder()
+                        .setColor(isNewUser ? 0xffa500 : (userBalance.currentBalance === 0 ? 0x00ff00 : userBalance.currentBalance < 25000 ? 0xffa500 : 0xff0000))
+                        .setTitle(isNewUser ? '¡Bienvenido al Sistema Gunfighters!' : '📊 Tus actividades y balance esta semana')
+                        .setDescription(isNewUser ? 
+                            `**${displayName}**\n\n¡Hola! Parece que aún no has registrado ninguna actividad.\n\n**🎯 Para empezar:**\n• Pulsa cualquier botón de actividad arriba\n• Carga las imágenes correspondientes y ¡listo!\n\n**💡 Estado actual:**\n• Actividades completadas: **0**\n• Contribuciones realizadas: **0**` :
+                            `**${displayName}**\n\n**🎯 Actividades registradas:**\n🧹 Limpieza de Espacios: ${activities.limpieza_espacios || 0}\n⚡ Restablecimiento Eléctrico: ${activities.abastecimiento_electrico || 0}\n💼 Asesoramiento Empresarial: ${activities.asesoramiento_empresarial || 0}\n🌱 Servicio de Jardinería: ${activities.jardineria || 0}\n⛽ Mantenimiento de Gasolineras: ${activities.mantenimiento_gasolineras || 0}\n🏢 Limpieza de Rascacielos: ${activities.limpieza_rascacielos || 0}\n\n**📊 Total actividades: ${activities.total}**`)
+                        .setTimestamp();
 
-                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                    if (!isNewUser) {
+                        embed.addFields([
+                            {
+                                name: '💰 Balance Semanal',
+                                value: `**Restante:** ${formatMoney(userBalance.currentBalance)}\n**Aportado:** ${formatMoney(weeklyTotal)}`,
+                                inline: true
+                            },
+                            {
+                                name: '🎯 Estado de Cuota',
+                                value: userBalance.currentBalance === 0 ? '✅ **Completada**' : '⏳ **Pendiente**',
+                                inline: true
+                            },
+                            {
+                                name: '📋 Contribuciones',
+                                value: `**${weeklyContributions.length}** aportes realizados\n**Semana:** ${currentWeek}`,
+                                inline: true
+                            }
+                        ]);
+                        embed.setFooter({ text: 'Los datos se reinician cada domingo a las 23:59 UTC' });
+                    } else {
+                        embed.addFields([
+                            {
+                                name: '💰 Balance Inicial',
+                                value: `**Cuota semanal:** ${formatMoney(userBalance.currentBalance)}\n**Estado:** ⏳ Sin actividades aún`,
+                                inline: true
+                            },
+                            {
+                                name: '🚀 Próximos Pasos',
+                                value: `1. Pulsa un botón de actividad arriba\n2. Envía la foto requerida\n3. ¡Aporte registrado!`,
+                                inline: true
+                            }
+                        ]);
+                        embed.setFooter({ text: 'Los datos se reinician cada domingo a las 23:59 UTC | ¡Empieza registrando tu primera actividad!' });
+                    }
+
+                    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                } catch (error) {
+                    console.error('❌ Error consultando actividades desde mensaje persistente:', error);
+                    
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('⚠️ Error al consultar actividades')
+                        .setDescription('Hubo un problema al obtener tus datos. Esto puede suceder si es tu primera vez usando el sistema.')
+                        .addFields([
+                            {
+                                name: '🔧 Soluciones:',
+                                value: '• Intenta registrar una actividad primero\n• Si el problema persiste, contacta a un administrador',
+                                inline: false
+                            }
+                        ])
+                        .setFooter({ text: 'Gunfighters - Sistema de Consulta' })
+                        .setTimestamp();
+                    
+                    await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                }
+                return;
+            }
+
+            if (interaction.customId === 'persistent_aportar') {
+                try {
+                    // Crear modal para capturar monto y descripción
+                    const modal = new ModalBuilder()
+                        .setCustomId('aportar_modal')
+                        .setTitle('💰 Registrar Aporte');
+
+                    // Campo para el monto
+                    const montoInput = new TextInputBuilder()
+                        .setCustomId('monto_input')
+                        .setLabel('Monto del encargo (en pesos)')
+                        .setStyle(TextInputStyle.Short)
+                        .setPlaceholder('Ej: 10000')
+                        .setRequired(true)
+                        .setMaxLength(10);
+
+                    // Campo para la descripción
+                    const descripcionInput = new TextInputBuilder()
+                        .setCustomId('descripcion_input')
+                        .setLabel('Descripción del trabajo realizado')
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setPlaceholder('Ej: Abastecimiento eléctrico en restaurante La Cocina')
+                        .setRequired(true)
+                        .setMinLength(5)
+                        .setMaxLength(500);
+
+                    // Crear filas para los inputs
+                    const firstActionRow = new ActionRowBuilder().addComponents(montoInput);
+                    const secondActionRow = new ActionRowBuilder().addComponents(descripcionInput);
+
+                    // Agregar los inputs al modal
+                    modal.addComponents(firstActionRow, secondActionRow);
+
+                    // Mostrar el modal
+                    await interaction.showModal(modal);
+                } catch (error) {
+                    console.error('❌ Error mostrando modal de aporte:', error);
+                    
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('⚠️ Error al abrir formulario')
+                        .setDescription('Hubo un problema al abrir el formulario de aporte.')
+                        .addFields([
+                            {
+                                name: '🔧 Alternativa:',
+                                value: 'Usa el comando `!aportar [monto] [descripción]` con una imagen adjunta',
+                                inline: false
+                            }
+                        ])
+                        .setTimestamp();
+                    
+                    await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                }
                 return;
             }
 

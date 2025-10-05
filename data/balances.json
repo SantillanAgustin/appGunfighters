@@ -1,68 +1,7 @@
 {
-  "users": {
-    "417479946177609729": {
-      "currentBalance": 45000,
-      "weeklyContributions": {
-        "2025-W40": [
-          {
-            "id": "1759416747162",
-            "totalAmount": 10000,
-            "organizationAmount": 5000,
-            "memberAmount": 5000,
-            "description": "Trabajo en restaurante La Mesa",
-            "photoUrl": "https://cdn.discordapp.com/attachments/1422208762231394416/1423321768902529044/image.png?ex=68dfe331&is=68de91b1&hm=3c3c0ddc65edfe5bbbfc781c4bf78de8d12e0d943cb8922c6c7431d24be5d5e4&",
-            "timestamp": "2025-10-02T14:52:27.162Z",
-            "week": "2025-W40"
-          }
-        ]
-      },
-      "totalContributed": 5000,
-      "lastActivity": "2025-10-02T14:52:27.162Z",
-      "username": "naranjuwu",
-      "displayName": "Kylan Freizer"
-    },
-    "1304717444895473687": {
-      "currentBalance": 37500,
-      "weeklyContributions": {
-        "2025-W40": [
-          {
-            "id": "1759417069333",
-            "totalAmount": 15000,
-            "organizationAmount": 7500,
-            "memberAmount": 7500,
-            "description": "Encargo mall",
-            "photoUrl": "https://cdn.discordapp.com/attachments/1422773389382123571/1423323119980122302/image.png?ex=68dfe473&is=68de92f3&hm=d70a0a2f06dbb61a4ce29dfcc80cb003d223a2e9b576f1d4b6b3b310a58624cb&",
-            "timestamp": "2025-10-02T14:57:49.333Z",
-            "week": "2025-W40"
-          },
-          {
-            "id": "1759418571115",
-            "totalAmount": 10000,
-            "organizationAmount": 5000,
-            "memberAmount": 5000,
-            "description": "Limpieza general",
-            "photoUrl": "https://cdn.discordapp.com/attachments/1422225645718470677/1423329419342123168/image.png?ex=68dfea51&is=68de98d1&hm=05ad8aac033cc1f38b69c7ae685ef7c6fc6a699e3b7d86d614ea19269d13de5f&",
-            "timestamp": "2025-10-02T15:22:51.115Z",
-            "week": "2025-W40"
-          }
-        ]
-      },
-      "totalContributed": 12500,
-      "lastActivity": "2025-10-02T15:22:51.115Z",
-      "username": "naranjuwu_",
-      "displayName": "Pepito"
-    }
-  },
-  "weeklyStats": {
-    "2025-W40": {
-      "totalContributions": 35000,
-      "totalOrganizationAmount": 17500,
-      "totalMemberAmount": 17500,
-      "activeMembers": 2,
-      "contributionsCount": 3
-    }
-  },
-  "lastReset": "2025-10-02T14:42:55.368Z",
+  "users": {},
+  "weeklyStats": {},
+  "lastReset": "2025-10-05T23:05:15.167Z",
   "settings": {
     "initialBalance": 50000,
     "organizationPercentage": 50

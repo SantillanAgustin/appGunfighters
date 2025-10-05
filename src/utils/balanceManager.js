@@ -13,7 +13,24 @@ function loadBalances() {
     try {
         if (fs.existsSync(BALANCES_FILE)) {
             const data = fs.readFileSync(BALANCES_FILE, 'utf8');
-            return JSON.parse(data);
+            const parsedData = JSON.parse(data);
+            
+            // Verificar que la estructura es válida
+            if (!parsedData || typeof parsedData !== 'object') {
+                throw new Error('Invalid balance data structure');
+            }
+            
+            // Asegurar que las propiedades básicas existen
+            if (!parsedData.users) parsedData.users = {};
+            if (!parsedData.weeklyStats) parsedData.weeklyStats = {};
+            if (!parsedData.settings) {
+                parsedData.settings = {
+                    initialBalance: INITIAL_BALANCE,
+                    organizationPercentage: ORGANIZATION_PERCENTAGE
+                };
+            }
+            
+            return parsedData;
         }
         return {
             users: {},
@@ -25,8 +42,8 @@ function loadBalances() {
             }
         };
     } catch (error) {
-        console.error('❌ Error al cargar balances:', error);
-        return {
+        console.error('❌ Error al cargar balances, recreando archivo:', error);
+        const fallbackData = {
             users: {},
             weeklyStats: {},
             lastReset: null,
@@ -35,6 +52,19 @@ function loadBalances() {
                 organizationPercentage: ORGANIZATION_PERCENTAGE
             }
         };
+        
+        try {
+            // Crear directorio si no existe
+            const dir = path.dirname(BALANCES_FILE);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            fs.writeFileSync(BALANCES_FILE, JSON.stringify(fallbackData, null, 2));
+        } catch (writeError) {
+            console.error('❌ Error escribiendo archivo de respaldo de balances:', writeError);
+        }
+        
+        return fallbackData;
     }
 }
 
@@ -58,6 +88,11 @@ function getUserBalance(userId) {
     const balances = loadBalances();
     const currentWeek = getCurrentWeekKey();
     
+    // Asegurar que la estructura básica existe
+    if (!balances.users) {
+        balances.users = {};
+    }
+    
     if (!balances.users[userId]) {
         balances.users[userId] = {
             currentBalance: balances.settings.initialBalance,
@@ -66,6 +101,11 @@ function getUserBalance(userId) {
             lastActivity: new Date().toISOString()
         };
         saveBalances(balances);
+    }
+    
+    // Asegurar que weeklyContributions existe
+    if (!balances.users[userId].weeklyContributions) {
+        balances.users[userId].weeklyContributions = {};
     }
     
     // Verificar si es una nueva semana
@@ -85,6 +125,11 @@ function registerContribution(userId, username, displayName, totalAmount, descri
     const organizationAmount = Math.floor(totalAmount * (balances.settings.organizationPercentage / 100));
     const memberAmount = totalAmount - organizationAmount;
     
+    // Asegurar que la estructura básica existe
+    if (!balances.users) {
+        balances.users = {};
+    }
+    
     // Asegurar que el usuario existe
     if (!balances.users[userId]) {
         balances.users[userId] = {
@@ -93,6 +138,11 @@ function registerContribution(userId, username, displayName, totalAmount, descri
             totalContributed: 0,
             lastActivity: new Date().toISOString()
         };
+    }
+    
+    // Asegurar que weeklyContributions existe
+    if (!balances.users[userId].weeklyContributions) {
+        balances.users[userId].weeklyContributions = {};
     }
     
     // Verificar si es una nueva semana
@@ -170,11 +220,24 @@ function getWeeklyStats(weekKey = null) {
         };
     }
     
+    // Asegurar que users existe
+    if (!balances.users) {
+        return {
+            week: week,
+            totalContributions: 0,
+            totalOrganizationAmount: 0,
+            totalMemberAmount: 0,
+            activeMembers: 0,
+            contributionsCount: 0,
+            users: []
+        };
+    }
+    
     // Obtener usuarios activos de la semana
     const activeUsers = [];
     for (const userId in balances.users) {
         const user = balances.users[userId];
-        if (user.weeklyContributions[week] && user.weeklyContributions[week].length > 0) {
+        if (user.weeklyContributions && user.weeklyContributions[week] && user.weeklyContributions[week].length > 0) {
             const weeklyTotal = user.weeklyContributions[week].reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
             activeUsers.push({
                 userId: userId,
@@ -204,19 +267,27 @@ function getAllUserBalances() {
     const currentWeek = getCurrentWeekKey();
     const userList = [];
     
+    // Asegurar que users existe
+    if (!balances.users) {
+        return userList;
+    }
+    
     for (const userId in balances.users) {
         const user = balances.users[userId];
-        const weeklyContributions = user.weeklyContributions[currentWeek] || [];
+        // Verificar que user y sus propiedades existen
+        if (!user) continue;
+        
+        const weeklyContributions = (user.weeklyContributions && user.weeklyContributions[currentWeek]) || [];
         const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
         
         userList.push({
             userId: userId,
             username: user.username || 'Usuario Desconocido',
             displayName: user.displayName || user.username || 'Usuario Desconocido',
-            currentBalance: user.currentBalance,
+            currentBalance: user.currentBalance || 0,
             weeklyContributed: weeklyTotal,
             contributionsCount: weeklyContributions.length,
-            quotaCompleted: user.currentBalance === 0,
+            quotaCompleted: (user.currentBalance || 0) === 0,
             lastActivity: user.lastActivity
         });
     }
@@ -326,6 +397,46 @@ function formatMoney(amount) {
     return `$${amount.toLocaleString('es-ES')}`;
 }
 
+/**
+ * Guardar ID de hilo de balance para un usuario
+ */
+function saveUserBalanceThread(userId, threadId) {
+    const balances = loadBalances();
+    
+    // Asegurar que users existe
+    if (!balances.users) {
+        balances.users = {};
+    }
+    
+    if (!balances.users[userId]) {
+        balances.users[userId] = {
+            currentBalance: balances.settings.initialBalance,
+            weeklyContributions: {},
+            totalContributed: 0,
+            lastActivity: new Date().toISOString(),
+            balanceThreadId: threadId
+        };
+    } else {
+        balances.users[userId].balanceThreadId = threadId;
+    }
+    
+    return saveBalances(balances);
+}
+
+/**
+ * Obtener ID de hilo de balance de un usuario
+ */
+function getUserBalanceThread(userId) {
+    const balances = loadBalances();
+    
+    // Asegurar que users existe
+    if (!balances.users || !balances.users[userId]) {
+        return null;
+    }
+    
+    return balances.users[userId].balanceThreadId || null;
+}
+
 module.exports = {
     loadBalances,
     saveBalances,
@@ -339,5 +450,7 @@ module.exports = {
     updateSettings,
     getSettings,
     clearAllBalanceData,
-    formatMoney
+    formatMoney,
+    saveUserBalanceThread,
+    getUserBalanceThread
 };
