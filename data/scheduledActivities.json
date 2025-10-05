@@ -2,7 +2,7 @@
   {
     "id": "limpieza_espacios_00",
     "name": "🧹 Limpieza de Espacios Públicos #1",
-    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 00-01hs UTC)",
+    "description": "Actividad del sistema: Limpieza de espacios públicos",
     "timeUTC": "00:00",
     "daysOfWeek": [
       0,
@@ -23,7 +23,7 @@
   {
     "id": "limpieza_espacios_06",
     "name": "🧹 Limpieza de Espacios Públicos #2",
-    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 06-07hs UTC)",
+    "description": "Actividad del sistema: Limpieza de espacios públicos",
     "timeUTC": "06:00",
     "daysOfWeek": [
       0,
@@ -44,7 +44,7 @@
   {
     "id": "limpieza_espacios_12",
     "name": "🧹 Limpieza de Espacios Públicos #3",
-    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 12-13hs UTC)",
+    "description": "Actividad del sistema: Limpieza de espacios públicos",
     "timeUTC": "12:00",
     "daysOfWeek": [
       0,
@@ -64,7 +64,7 @@
   {
     "id": "limpieza_espacios_21",
     "name": "🧹 Limpieza de Espacios Públicos #4",
-    "description": "Actividad del sistema: Limpieza de espacios públicos (Horario: 21-22hs UTC)",
+    "description": "Actividad del sistema: Limpieza de espacios públicos",
     "timeUTC": "21:00",
     "daysOfWeek": [
       0,
@@ -84,7 +84,7 @@
   {
     "id": "restablecimiento_electrico_03",
     "name": "⚡ Restablecimiento Eléctrico #1",
-    "description": "Actividad del sistema: Restablecimiento eléctrico (Horario: 03-04hs UTC)",
+    "description": "Actividad del sistema: Restablecimiento eléctrico",
     "timeUTC": "03:00",
     "daysOfWeek": [
       0,
@@ -105,7 +105,7 @@
   {
     "id": "restablecimiento_electrico_15",
     "name": "⚡ Restablecimiento Eléctrico #2",
-    "description": "Actividad del sistema: Restablecimiento eléctrico (Horario: 15-16hs UTC)",
+    "description": "Actividad del sistema: Restablecimiento eléctrico",
     "timeUTC": "15:00",
     "daysOfWeek": [
       0,
@@ -126,7 +126,7 @@
   {
     "id": "restablecimiento_electrico_18",
     "name": "⚡ Restablecimiento Eléctrico #3",
-    "description": "Actividad del sistema: Restablecimiento eléctrico (Horario: 18-19hs UTC)",
+    "description": "Actividad del sistema: Restablecimiento eléctrico",
     "timeUTC": "18:00",
     "daysOfWeek": [
       0,
@@ -146,7 +146,7 @@
   {
     "id": "restablecimiento_electrico_20",
     "name": "⚡ Restablecimiento Eléctrico #4",
-    "description": "Actividad del sistema: Restablecimiento eléctrico (Horario: 20-21hs UTC)",
+    "description": "Actividad del sistema: Restablecimiento eléctrico",
     "timeUTC": "20:00",
     "daysOfWeek": [
       0,
@@ -166,7 +166,7 @@
   {
     "id": "asesoramiento_empresarial_01",
     "name": "💼 Asesoramiento Empresarial #1",
-    "description": "Actividad del sistema: Asesoramiento empresarial (Horario: 01-02hs UTC)",
+    "description": "Actividad del sistema: Asesoramiento empresarial",
     "timeUTC": "01:00",
     "daysOfWeek": [
       0,
@@ -186,7 +186,7 @@
   {
     "id": "asesoramiento_empresarial_10",
     "name": "💼 Asesoramiento Empresarial #2",
-    "description": "Actividad del sistema: Asesoramiento empresarial (Horario: 10-11hs UTC)",
+    "description": "Actividad del sistema: Asesoramiento empresarial",
     "timeUTC": "10:00",
     "daysOfWeek": [
       0,
@@ -206,7 +206,7 @@
   {
     "id": "asesoramiento_empresarial_13",
     "name": "💼 Asesoramiento Empresarial #3",
-    "description": "Actividad del sistema: Asesoramiento empresarial (Horario: 13-14hs UTC)",
+    "description": "Actividad del sistema: Asesoramiento empresarial",
     "timeUTC": "13:00",
     "daysOfWeek": [
       0,
@@ -226,7 +226,7 @@
   {
     "id": "servicio_jardineria_04",
     "name": "🌱 Servicio de Jardinería #1",
-    "description": "Actividad del sistema: Servicio de jardinería (Horario: 04-05hs UTC)",
+    "description": "Actividad del sistema: Servicio de jardinería",
     "timeUTC": "04:00",
     "daysOfWeek": [
       0,
@@ -248,7 +248,7 @@
   {
     "id": "servicio_jardineria_22",
     "name": "🌱 Servicio de Jardinería #2",
-    "description": "Actividad del sistema: Servicio de jardinería (Horario: 22-23hs UTC)",
+    "description": "Actividad del sistema: Servicio de jardinería",
     "timeUTC": "22:00",
     "daysOfWeek": [
       0,
@@ -268,7 +268,7 @@
   {
     "id": "mantenimiento_gasolineras_02",
     "name": "⛽ Mantenimiento de Gasolineras #1",
-    "description": "Actividad del sistema: Mantenimiento de gasolineras (Horario: 02-03hs UTC)",
+    "description": "Actividad del sistema: Mantenimiento de gasolineras",
     "timeUTC": "02:00",
     "daysOfWeek": [
       0,
@@ -289,7 +289,7 @@
   {
     "id": "mantenimiento_gasolineras_08",
     "name": "⛽ Mantenimiento de Gasolineras #2",
-    "description": "Actividad del sistema: Mantenimiento de gasolineras (Horario: 08-09hs UTC)",
+    "description": "Actividad del sistema: Mantenimiento de gasolineras",
     "timeUTC": "08:00",
     "daysOfWeek": [
       0,
@@ -309,7 +309,7 @@
   {
     "id": "mantenimiento_gasolineras_16",
     "name": "⛽ Mantenimiento de Gasolineras #3",
-    "description": "Actividad del sistema: Mantenimiento de gasolineras (Horario: 16-17hs UTC)",
+    "description": "Actividad del sistema: Mantenimiento de gasolineras",
     "timeUTC": "16:00",
     "daysOfWeek": [
       0,
@@ -329,7 +329,7 @@
   {
     "id": "limpieza_rascacielos_09",
     "name": "🏢 Limpieza de Rascacielos #1",
-    "description": "Actividad del sistema: Limpieza de rascacielos (Horario: 09-10hs UTC)",
+    "description": "Actividad del sistema: Limpieza de rascacielos",
     "timeUTC": "09:00",
     "daysOfWeek": [
       0,
@@ -349,7 +349,7 @@
   {
     "id": "limpieza_rascacielos_19",
     "name": "🏢 Limpieza de Rascacielos #2",
-    "description": "Actividad del sistema: Limpieza de rascacielos (Horario: 19-20hs UTC)",
+    "description": "Actividad del sistema: Limpieza de rascacielos",
     "timeUTC": "19:00",
     "daysOfWeek": [
       0,
