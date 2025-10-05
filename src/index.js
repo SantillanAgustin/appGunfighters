@@ -409,12 +409,12 @@ async function checkWeeklyBalanceReset() {
             if (resetWeeklyBalances()) {
                 console.log('✅ Balances semanales reseteados exitosamente');
                 
-                // Opcional: Enviar notificación al canal de recordatorios
-                if (process.env.REMINDERS_CHANNEL_ID) {
+                // Opcional: Enviar notificación al canal de informes
+                if (process.env.REPORTS_CHANNEL_ID) {
                     const guild = client.guilds.cache.get(process.env.GUILD_ID);
                     if (guild) {
-                        const reminderChannel = guild.channels.cache.get(process.env.REMINDERS_CHANNEL_ID);
-                        if (reminderChannel) {
+                        const reportsChannel = guild.channels.cache.get(process.env.REPORTS_CHANNEL_ID);
+                        if (reportsChannel) {
                             const embed = new EmbedBuilder()
                                 .setColor(0x00ff00)
                                 .setTitle('💰 Nueva Semana - Balances Reseteados')
@@ -439,7 +439,7 @@ async function checkWeeklyBalanceReset() {
                                 .setFooter({ text: 'Gunfighters - Sistema de Balances' })
                                 .setTimestamp();
 
-                            await reminderChannel.send({
+                            await reportsChannel.send({
                                 content: process.env.SUPERVISOR_ROLE_ID ? `<@&${process.env.SUPERVISOR_ROLE_ID}>` : '',
                                 embeds: [embed]
                             });
