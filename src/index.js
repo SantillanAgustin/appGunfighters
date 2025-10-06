@@ -401,15 +401,21 @@ async function checkWeeklyBalanceReset() {
     try {
         if (shouldResetWeeklyBalances()) {
             console.log('⏰ Es momento de resetear los balances semanales...');
+            console.log('🔧 Variables de entorno relevantes:');
+            console.log('   REPORTS_CHANNEL_ID:', process.env.REPORTS_CHANNEL_ID);
+            console.log('   REMINDERS_CHANNEL_ID:', process.env.REMINDERS_CHANNEL_ID);
+            console.log('   GUILD_ID:', process.env.GUILD_ID);
             
             if (resetWeeklyBalances()) {
                 console.log('✅ Balances semanales reseteados exitosamente');
                 
                 // Opcional: Enviar notificación al canal de informes
+                console.log('🔍 REPORTS_CHANNEL_ID configurado:', process.env.REPORTS_CHANNEL_ID);
                 if (process.env.REPORTS_CHANNEL_ID) {
                     const guild = client.guilds.cache.get(process.env.GUILD_ID);
                     if (guild) {
                         const reportsChannel = guild.channels.cache.get(process.env.REPORTS_CHANNEL_ID);
+                        console.log('📊 Canal de informes encontrado:', reportsChannel ? reportsChannel.name : 'NO ENCONTRADO');
                         if (reportsChannel) {
                             const embed = new EmbedBuilder()
                                 .setColor(0x00ff00)
@@ -439,8 +445,15 @@ async function checkWeeklyBalanceReset() {
                                 content: process.env.SUPERVISOR_ROLE_ID ? `<@&${process.env.SUPERVISOR_ROLE_ID}>` : '',
                                 embeds: [embed]
                             });
+                            console.log('✅ Mensaje de reset de balances enviado al canal de informes:', reportsChannel.name);
+                        } else {
+                            console.error('❌ No se pudo encontrar el canal de informes con ID:', process.env.REPORTS_CHANNEL_ID);
                         }
+                    } else {
+                        console.error('❌ No se pudo encontrar el servidor para reset de balances');
                     }
+                } else {
+                    console.log('⚠️ REPORTS_CHANNEL_ID no está configurado, no se enviará notificación de reset');
                 }
             }
         }
