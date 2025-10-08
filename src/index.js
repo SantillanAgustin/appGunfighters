@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, ModalBuilder, TextInputBuilder, TextInputStyle, StringSelectMenuBuilder } = require('discord.js');
 const { 
     registerActivity, 
     getUserActivities, 
@@ -49,6 +49,40 @@ const {
     clearAllBalanceData
 } = require('./utils/balanceManager');
 
+// Opciones predefinidas para tipos de trabajos/encargos
+const TRABAJO_OPTIONS = [
+    {
+        label: '🧹 Limpieza',
+        description: 'Servicios de limpieza y mantenimiento de espacios',
+        value: 'limpieza'
+    },
+    {
+        label: '🔧 Mantenimiento',
+        description: 'Mantenimiento preventivo y correctivo de instalaciones',
+        value: 'mantenimiento'
+    },
+    {
+        label: '⚡ Servicio de electricidad',
+        description: 'Instalación, reparación y mantenimiento eléctrico',
+        value: 'electricidad'
+    },
+    {
+        label: '🗑️ Sacar basura',
+        description: 'Recolección y gestión de residuos',
+        value: 'sacar_basura'
+    },
+    {
+        label: '🦟 Fumigación',
+        description: 'Control de plagas y fumigación',
+        value: 'fumigacion'
+    },
+    {
+        label: '🎨 Pintar paredes',
+        description: 'Trabajos de pintura y acabados',
+        value: 'pintar_paredes'
+    }
+];
+
 // Crear el cliente del bot
 const client = new Client({
     intents: [
@@ -66,6 +100,9 @@ setInterval(checkAndGenerateWeeklyReport, 60000);
 
 // Verificar mensaje persistente cada 5 minutos
 setInterval(checkPersistentMessage, 300000);
+
+// Verificar panel de administración cada 5 minutos
+setInterval(checkAdminPanel, 300000);
 
 // Verificar recordatorios de actividades programadas cada minuto
 setInterval(checkScheduledReminders, 60000);
@@ -234,7 +271,7 @@ async function createPersistentRegisterMessage() {
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
                     .setCustomId('persistent_aportar')
-                    .setLabel('💰 Realizar Aporte')
+                    .setLabel('💰 Registro De Encargo')
                     .setStyle(ButtonStyle.Secondary)
             );
 
@@ -320,6 +357,143 @@ async function checkPersistentMessage() {
 
     } catch (error) {
         console.error('❌ Error verificando mensaje persistente:', error);
+    }
+}
+
+/**
+ * Crear el mensaje persistente del panel de administración
+ */
+async function createPersistentAdminPanel() {
+    try {
+        if (!process.env.ADMIN_PANEL_CHANNEL_ID) {
+            console.log('⚠️ ADMIN_PANEL_CHANNEL_ID no configurado. Panel de administración no creado.');
+            return;
+        }
+
+        const guild = client.guilds.cache.get(process.env.GUILD_ID);
+        if (!guild) {
+            console.error('❌ No se pudo encontrar el servidor para panel admin');
+            return;
+        }
+
+        const adminChannel = guild.channels.cache.get(process.env.ADMIN_PANEL_CHANNEL_ID);
+        if (!adminChannel) {
+            console.error('❌ No se pudo encontrar el canal de panel de administración');
+            return;
+        }
+
+        // Verificar si ya existe un mensaje del panel
+        try {
+            const recentMessages = await adminChannel.messages.fetch({ limit: 10 });
+            const existingAdminMessage = recentMessages.find(msg => 
+                msg.author.id === client.user.id && 
+                msg.embeds.length > 0 &&
+                msg.embeds[0].title?.includes('Panel de Administración')
+            );
+            
+            if (existingAdminMessage) {
+                console.log(`✅ Panel de administración ya existe (${existingAdminMessage.id})`);
+                return existingAdminMessage;
+            }
+        } catch (fetchError) {
+            console.log('⚠️ Error verificando mensajes de admin, continuando con creación...');
+        }
+
+        // Crear embed del panel de administración
+        const adminEmbed = new EmbedBuilder()
+            .setColor(0xff6b35)
+            .setTitle('🛠️ Panel de Administración - Gunfighters')
+            .setDescription('**Panel de control exclusivo para administradores y líderes**\n\n' +
+                'Utiliza los botones a continuación para acceder rápidamente a las funciones administrativas del sistema.')
+            .addFields([
+                {
+                    name: '📊 Funciones Disponibles',
+                    value: '• **Generar Informe** - Reporte semanal manual\n' +
+                           '• **Ver Balances** - Resumen de todos los usuarios\n' +
+                           '• **Configuración** - Estado del sistema\n' +
+                           '• **Limpiar Datos** - Reset completo del sistema',
+                    inline: false
+                },
+                {
+                    name: '⚠️ Permisos Requeridos',
+                    value: 'Solo usuarios con permisos de **Gestionar Mensajes** o rol de **Líder** pueden usar estos botones.',
+                    inline: false
+                }
+            ])
+            .setFooter({ text: 'Gunfighters - Sistema de Administración' })
+            .setTimestamp();
+
+        // Crear botones del panel de administración
+        const adminRow1 = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('admin_generar_informe')
+                    .setLabel('📊 Generar Informe')
+                    .setStyle(ButtonStyle.Primary),
+                new ButtonBuilder()
+                    .setCustomId('admin_ver_balances')
+                    .setLabel('💰 Ver Balances')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('admin_configuracion')
+                    .setLabel('⚙️ Configuración')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+
+        const adminRow2 = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('admin_limpiar_datos')
+                    .setLabel('🗑️ Limpiar Datos')
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId('admin_crear_mensaje')
+                    .setLabel('🔄 Recrear Mensajes')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+
+        // Enviar mensaje del panel de administración
+        const adminMessage = await adminChannel.send({
+            embeds: [adminEmbed],
+            components: [adminRow1, adminRow2]
+        });
+
+        console.log(`✅ Panel de administración creado: ${adminMessage.id}`);
+        return adminMessage;
+
+    } catch (error) {
+        console.error('❌ Error creando panel de administración:', error);
+    }
+}
+
+/**
+ * Verificar y mantener el panel de administración
+ */
+async function checkAdminPanel() {
+    try {
+        if (!process.env.ADMIN_PANEL_CHANNEL_ID) return;
+
+        const guild = client.guilds.cache.get(process.env.GUILD_ID);
+        if (!guild) return;
+
+        const adminChannel = guild.channels.cache.get(process.env.ADMIN_PANEL_CHANNEL_ID);
+        if (!adminChannel) return;
+
+        // Verificar si existe el panel
+        const recentMessages = await adminChannel.messages.fetch({ limit: 10 });
+        const existingAdminMessage = recentMessages.find(msg => 
+            msg.author.id === client.user.id && 
+            msg.embeds.length > 0 &&
+            msg.embeds[0].title?.includes('Panel de Administración')
+        );
+
+        if (!existingAdminMessage) {
+            console.log('🛠️ Panel de administración no encontrado, creando...');
+            await createPersistentAdminPanel();
+        }
+
+    } catch (error) {
+        console.error('❌ Error verificando panel de administración:', error);
     }
 }
 
@@ -653,6 +827,11 @@ client.once('clientReady', async () => {
     setTimeout(async () => {
         await checkPersistentMessage();
     }, 3000); // Esperar 3 segundos para asegurar que todo esté cargado
+    
+    // Crear/verificar panel de administración
+    setTimeout(async () => {
+        await checkAdminPanel();
+    }, 5000); // Esperar 5 segundos adicionales
 });
 
 // Evento para manejar mensajes
@@ -907,7 +1086,7 @@ client.on('messageCreate', async message => {
         let commands = '`!help`, `!registro`, `!balance`, `!aportar`';
         
         if (canManageMessages) {
-            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`, `!balances`, `!estadisticas-balance`';
+            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!crear-panel-admin`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`, `!balances`, `!estadisticas-balance`';
         }
         
         if (isAdmin) {
@@ -1272,6 +1451,68 @@ client.on('messageCreate', async message => {
         } catch (error) {
             console.error('❌ Error creando mensaje persistente:', error);
             await message.reply('❌ Error al crear el mensaje persistente. Revisa la configuración del bot.');
+        }
+    }
+
+    // Comando para crear panel de administración
+    if (command === 'crear-panel-admin') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para crear el panel de administración.');
+        }
+
+        if (!process.env.ADMIN_PANEL_CHANNEL_ID) {
+            return message.reply('❌ Variable ADMIN_PANEL_CHANNEL_ID no configurada en el archivo .env\n\n' +
+                '**Para configurarlo:**\n' +
+                '1. Crea un canal #panel-admin\n' +
+                '2. Activa Modo Desarrollador en Discord\n' +
+                '3. Clic derecho en el canal → Copiar ID del canal\n' +
+                '4. Agrega `ADMIN_PANEL_CHANNEL_ID=tu_id_aqui` al archivo .env');
+        }
+
+        try {
+            const processingEmbed = new EmbedBuilder()
+                .setColor(0xffa500)
+                .setTitle('🔄 Creando Panel de Administración...')
+                .setDescription('Por favor espera mientras se crea el panel de administración...')
+                .setTimestamp();
+
+            const processingMessage = await message.reply({ embeds: [processingEmbed] });
+
+            // Crear nuevo panel
+            const newPanel = await createPersistentAdminPanel();
+
+            if (newPanel) {
+                const successEmbed = new EmbedBuilder()
+                    .setColor(0x00ff00)
+                    .setTitle('✅ Panel de Administración Creado')
+                    .setDescription(`El panel de administración ha sido creado exitosamente en <#${process.env.ADMIN_PANEL_CHANNEL_ID}>`)
+                    .addFields([
+                        {
+                            name: '📝 ID del Panel',
+                            value: newPanel.id,
+                            inline: true
+                        },
+                        {
+                            name: '📍 Canal',
+                            value: `<#${process.env.ADMIN_PANEL_CHANNEL_ID}>`,
+                            inline: true
+                        },
+                        {
+                            name: '🛠️ Funciones Disponibles',
+                            value: '• Generar Informe\n• Ver Balances\n• Configuración\n• Limpiar Datos\n• Recrear Mensajes',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+
+                await processingMessage.edit({ embeds: [successEmbed] });
+            } else {
+                throw new Error('No se pudo crear el panel');
+            }
+
+        } catch (error) {
+            console.error('❌ Error creando panel de administración:', error);
+            await message.reply('❌ Error al crear el panel de administración. Revisa la configuración del bot.');
         }
     }
 
@@ -1938,9 +2179,9 @@ client.on('messageCreate', async message => {
     }
 });
 
-// Evento para manejar interacciones de botones
+// Evento para manejar interacciones de botones, modales y menús desplegables
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isButton() && !interaction.isModalSubmit()) return;
+    if (!interaction.isButton() && !interaction.isModalSubmit() && !interaction.isStringSelectMenu()) return;
 
     // Verificar servidor autorizado
     if (interaction.guild?.id !== process.env.GUILD_ID) return;
@@ -1949,7 +2190,6 @@ client.on('interactionCreate', async interaction => {
         // Manejar envío de modal de aporte
         if (interaction.isModalSubmit() && interaction.customId === 'aportar_modal') {
             const monto = interaction.fields.getTextInputValue('monto_input');
-            const descripcion = interaction.fields.getTextInputValue('descripcion_input');
             
             // Validar monto
             const amount = parseInt(monto);
@@ -1970,33 +2210,13 @@ client.on('interactionCreate', async interaction => {
                 return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
             }
             
-            // Validar descripción
-            if (descripcion.length < 5) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(0xff0000)
-                    .setTitle('❌ Descripción Muy Corta')
-                    .setDescription('La descripción debe tener al menos 5 caracteres.')
-                    .addFields([
-                        {
-                            name: '💡 Ejemplo:',
-                            value: 'Abastecimiento eléctrico en restaurante La Cocina',
-                            inline: false
-                        }
-                    ])
-                    .setTimestamp();
-                    
-                return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
-            }
-            
-            // Guardar datos temporalmente y pedir imagen
+            // Guardar el monto temporalmente
             const pendingAporte = {
                 userId: interaction.user.id,
                 monto: amount,
-                descripcion: descripcion,
                 timestamp: Date.now()
             };
             
-            // Guardar en una estructura temporal (usando el mismo sistema que las actividades)
             const data = require('./utils/activityManager').loadData();
             if (!data.pendingAportes) {
                 data.pendingAportes = {};
@@ -2004,14 +2224,71 @@ client.on('interactionCreate', async interaction => {
             data.pendingAportes[interaction.user.id] = pendingAporte;
             require('./utils/activityManager').saveData(data);
             
+            // Crear dropdown con opciones de trabajo
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId('trabajo_select')
+                .setPlaceholder('Selecciona el tipo de trabajo realizado')
+                .addOptions(TRABAJO_OPTIONS);
+
+            const row = new ActionRowBuilder().addComponents(selectMenu);
+
+            const embed = new EmbedBuilder()
+                .setColor(0x4A90E2)
+                .setTitle('� Selecciona el tipo de trabajo')
+                .setDescription(`**💵 Monto ingresado:** ${formatMoney(amount)}\n\nAhora selecciona qué tipo de trabajo realizaste:`)
+                .setFooter({ text: 'Gunfighters - Sistema de Aportes' })
+                .setTimestamp();
+                
+            await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+            
+            // Limpiar datos temporales después de 5 minutos
+            setTimeout(() => {
+                const currentData = require('./utils/activityManager').loadData();
+                if (currentData.pendingAportes && currentData.pendingAportes[interaction.user.id]) {
+                    delete currentData.pendingAportes[interaction.user.id];
+                    require('./utils/activityManager').saveData(currentData);
+                }
+            }, 5 * 60 * 1000);
+            
+            return;
+        }
+
+        // Manejar selección del tipo de trabajo
+        if (interaction.isStringSelectMenu() && interaction.customId === 'trabajo_select') {
+            const selectedWork = interaction.values[0];
+            
+            // Buscar los datos del aporte pendiente
+            const data = require('./utils/activityManager').loadData();
+            const pendingAporte = data.pendingAportes?.[interaction.user.id];
+            
+            if (!pendingAporte) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(0xff0000)
+                    .setTitle('❌ Sesión Expirada')
+                    .setDescription('No se encontraron datos del aporte. Por favor, inicia el proceso nuevamente.')
+                    .setTimestamp();
+                    
+                return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+            }
+            
+            // Obtener la descripción del trabajo seleccionado
+            const trabajoSeleccionado = TRABAJO_OPTIONS.find(option => option.value === selectedWork);
+            const descripcion = trabajoSeleccionado ? trabajoSeleccionado.description : selectedWork;
+            
+            // Actualizar los datos del aporte con la descripción seleccionada
+            pendingAporte.descripcion = descripcion;
+            pendingAporte.tipoTrabajo = selectedWork;
+            data.pendingAportes[interaction.user.id] = pendingAporte;
+            require('./utils/activityManager').saveData(data);
+            
             const settings = getSettings();
-            const organizationAmount = Math.floor(amount * (settings.organizationPercentage / 100));
-            const memberAmount = amount - organizationAmount;
+            const organizationAmount = Math.floor(pendingAporte.monto * (settings.organizationPercentage / 100));
+            const memberAmount = pendingAporte.monto - organizationAmount;
             
             const embed = new EmbedBuilder()
                 .setColor(0xffa500)
                 .setTitle('📸 Aporte Registrado - Envía la Imagen')
-                .setDescription(`**Información del aporte:**\n\n**💵 Monto:** ${formatMoney(amount)}\n**📝 Descripción:** ${descripcion}\n\n**💰 Distribución:**\n🏢 Para la organización: ${formatMoney(organizationAmount)}\n👤 Tu ganancia: ${formatMoney(memberAmount)}`)
+                .setDescription(`**Información del aporte:**\n\n**💵 Monto:** ${formatMoney(pendingAporte.monto)}\n**🔧 Tipo de trabajo:** ${trabajoSeleccionado?.label || selectedWork}\n**📝 Descripción:** ${descripcion}\n\n**💰 Distribución:**\n🏢 Para la organización: ${formatMoney(organizationAmount)}\n👤 Tu ganancia: ${formatMoney(memberAmount)}`)
                 .addFields([
                     {
                         name: '📸 Próximo paso:',
@@ -2027,17 +2304,7 @@ client.on('interactionCreate', async interaction => {
                 .setFooter({ text: 'Gunfighters - Sistema de Aportes' })
                 .setTimestamp();
                 
-            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-            
-            // Limpiar datos temporales después de 5 minutos
-            setTimeout(() => {
-                const currentData = require('./utils/activityManager').loadData();
-                if (currentData.pendingAportes && currentData.pendingAportes[interaction.user.id]) {
-                    delete currentData.pendingAportes[interaction.user.id];
-                    require('./utils/activityManager').saveData(currentData);
-                }
-            }, 5 * 60 * 1000);
-            
+            await interaction.update({ embeds: [embed], components: [] });
             return;
         }
 
@@ -2110,6 +2377,328 @@ client.on('interactionCreate', async interaction => {
             .setTimestamp();
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        }
+
+        // Manejar botones del panel de administración
+        if (interaction.customId.startsWith('admin_')) {
+            // Verificar permisos de administrador o líder
+            const hasAdminPermissions = interaction.member.permissions.has(PermissionFlagsBits.ManageMessages) ||
+                                      (process.env.LIDER_ROLE_ID && interaction.member.roles.cache.has(process.env.LIDER_ROLE_ID));
+
+            if (!hasAdminPermissions) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(0xff0000)
+                    .setTitle('❌ Acceso Denegado')
+                    .setDescription('No tienes permisos para usar el panel de administración.')
+                    .addFields([
+                        {
+                            name: '🔒 Permisos Requeridos',
+                            value: '• Gestionar Mensajes\n• Rol de Líder (si está configurado)',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+
+                return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+            }
+
+            if (interaction.customId === 'admin_generar_informe') {
+                try {
+                    const processingEmbed = new EmbedBuilder()
+                        .setColor(0xffa500)
+                        .setTitle('📊 Generando Informe...')
+                        .setDescription('Por favor espera mientras se genera el informe semanal...')
+                        .setTimestamp();
+
+                    await interaction.reply({ embeds: [processingEmbed], flags: MessageFlags.Ephemeral });
+
+                    // Generar el informe
+                    const report = generateWeeklyReport();
+                    
+                    // Guardar el informe en el historial
+                    saveWeeklyReport(report);
+                    
+                    // Formatear para Discord
+                    const embed = formatWeeklyReport(report);
+                    
+                    // Editar el mensaje con el informe
+                    await interaction.editReply({
+                        content: '📊 **INFORME SEMANAL DE ACTIVIDADES** (Generado desde panel)',
+                        embeds: [embed]
+                    });
+                    
+                    console.log('✅ Informe semanal generado desde panel por:', interaction.user.tag);
+                    
+                } catch (error) {
+                    console.error('❌ Error generando informe desde panel:', error);
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('❌ Error')
+                        .setDescription('Hubo un error al generar el informe.')
+                        .setTimestamp();
+                    
+                    await interaction.editReply({ embeds: [errorEmbed] });
+                }
+                return;
+            }
+
+            if (interaction.customId === 'admin_ver_balances') {
+                try {
+                    const allBalances = getAllUserBalances();
+                    const currentWeek = getCurrentWeekKey();
+                    const settings = getSettings();
+
+                    if (allBalances.length === 0) {
+                        const embed = new EmbedBuilder()
+                            .setColor(0xffa500)
+                            .setTitle('💰 Balances Semanales')
+                            .setDescription('No hay usuarios con balances registrados.')
+                            .setTimestamp();
+                        
+                        return await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+                    }
+
+                    const embed = new EmbedBuilder()
+                        .setColor(0x3498db)
+                        .setTitle('💰 Balances Semanales - Resumen')
+                        .setDescription(`**Semana:** ${currentWeek}\n**Configuración:** ${settings.organizationPercentage}% para la organización`)
+                        .setTimestamp();
+
+                    let completedQuotas = 0;
+                    let totalContributed = 0;
+
+                    // Agrupar usuarios por estado
+                    const usersWithDebt = [];
+                    const usersCompleted = [];
+
+                    for (const user of allBalances) {
+                        totalContributed += user.weeklyContributed;
+                        
+                        if (user.currentBalance === 0) {
+                            completedQuotas++;
+                            usersCompleted.push(user);
+                        } else {
+                            usersWithDebt.push(user);
+                        }
+                    }
+
+                    // Estadísticas generales
+                    embed.addFields([
+                        {
+                            name: '📊 Estadísticas Generales',
+                            value: `**Usuarios activos:** ${allBalances.length}\n**Cuotas completadas:** ${completedQuotas}\n**Total aportado:** ${formatMoney(totalContributed)}`,
+                            inline: false
+                        }
+                    ]);
+
+                    // Usuarios con deuda pendiente
+                    if (usersWithDebt.length > 0) {
+                        const debtList = usersWithDebt.slice(0, 10).map(user => {
+                            return `• **${user.displayName}**: ${formatMoney(user.currentBalance)} restante`;
+                        }).join('\n');
+                        
+                        embed.addFields([
+                            {
+                                name: '⏳ Cuotas Pendientes',
+                                value: debtList + (usersWithDebt.length > 10 ? `\n... y ${usersWithDebt.length - 10} más` : ''),
+                                inline: false
+                            }
+                        ]);
+                    }
+
+                    // Usuarios con cuota completada
+                    if (usersCompleted.length > 0) {
+                        const completedList = usersCompleted.slice(0, 10).map(user => {
+                            return `• **${user.displayName}**: ✅ Completada`;
+                        }).join('\n');
+                        
+                        embed.addFields([
+                            {
+                                name: '✅ Cuotas Completadas',
+                                value: completedList + (usersCompleted.length > 10 ? `\n... y ${usersCompleted.length - 10} más` : ''),
+                                inline: false
+                            }
+                        ]);
+                    }
+
+                    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+
+                } catch (error) {
+                    console.error('❌ Error consultando balances desde panel:', error);
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('❌ Error')
+                        .setDescription('Hubo un error al consultar los balances.')
+                        .setTimestamp();
+                    
+                    await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                }
+                return;
+            }
+
+            if (interaction.customId === 'admin_configuracion') {
+                try {
+                    // Verificar configuraciones del bot
+                    const threadsChannelStatus = process.env.THREADS_CHANNEL_ID ? 
+                        `✅ <#${process.env.THREADS_CHANNEL_ID}>` : '❌ No configurado';
+                    
+                    const balanceChannelStatus = process.env.BALANCE_THREADS_CHANNEL_ID ? 
+                        `✅ <#${process.env.BALANCE_THREADS_CHANNEL_ID}>` : '❌ No configurado';
+                    
+                    const registerChannelStatus = process.env.REGISTER_CHANNEL_ID ? 
+                        `✅ <#${process.env.REGISTER_CHANNEL_ID}>` : '❌ No configurado';
+                    
+                    const reportsChannelStatus = process.env.REPORTS_CHANNEL_ID ? 
+                        `✅ <#${process.env.REPORTS_CHANNEL_ID}>` : '❌ No configurado';
+                    
+                    const adminChannelStatus = process.env.ADMIN_PANEL_CHANNEL_ID ? 
+                        `✅ <#${process.env.ADMIN_PANEL_CHANNEL_ID}>` : '❌ No configurado';
+                    
+                    const roleStatus = process.env.SUPERVISOR_ROLE_ID ? 
+                        `✅ <@&${process.env.SUPERVISOR_ROLE_ID}>` : '⚠️ No configurado';
+                    
+                    const liderRoleStatus = process.env.LIDER_ROLE_ID ? 
+                        `✅ <@&${process.env.LIDER_ROLE_ID}>` : '⚠️ No configurado';
+                    
+                    const autoDeleteStatus = process.env.AUTO_DELETE_PHOTOS === 'true' ? 
+                        '✅ **Activado**' : '❌ **Desactivado**';
+
+                    const configEmbed = new EmbedBuilder()
+                        .setColor(0x3498db)
+                        .setTitle('⚙️ Configuración del Sistema')
+                        .setDescription('**Estado actual de la configuración del bot**')
+                        .addFields([
+                            {
+                                name: '📺 Canales Configurados',
+                                value: `**Hilos Actividades:** ${threadsChannelStatus}\n` +
+                                       `**Hilos Balance:** ${balanceChannelStatus}\n` +
+                                       `**Registro:** ${registerChannelStatus}\n` +
+                                       `**Informes:** ${reportsChannelStatus}\n` +
+                                       `**Panel Admin:** ${adminChannelStatus}`,
+                                inline: true
+                            },
+                            {
+                                name: '👥 Roles Configurados',
+                                value: `**Supervisor:** ${roleStatus}\n**Líder:** ${liderRoleStatus}`,
+                                inline: true
+                            },
+                            {
+                                name: '🧹 Eliminación Automática',
+                                value: autoDeleteStatus,
+                                inline: true
+                            },
+                            {
+                                name: '📊 Sistema de Registro',
+                                value: '✅ **Funcionando**\n6 actividades disponibles',
+                                inline: true
+                            },
+                            {
+                                name: '💰 Sistema de Balances',
+                                value: '✅ **Funcionando**\nAportes con hilos automáticos',
+                                inline: true
+                            },
+                            {
+                                name: '🛠️ Panel de Administración',
+                                value: '✅ **Funcionando**\nAcceso mediante botones',
+                                inline: true
+                            }
+                        ])
+                        .setFooter({ text: 'Gunfighters - Panel de Control' })
+                        .setTimestamp();
+                        
+                    await interaction.reply({ embeds: [configEmbed], flags: MessageFlags.Ephemeral });
+
+                } catch (error) {
+                    console.error('❌ Error mostrando configuración desde panel:', error);
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('❌ Error')
+                        .setDescription('Hubo un error al mostrar la configuración.')
+                        .setTimestamp();
+                    
+                    await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                }
+                return;
+            }
+
+            if (interaction.customId === 'admin_limpiar_datos') {
+                try {
+                    // Solo administradores completos pueden usar limpiar datos
+                    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+                        const errorEmbed = new EmbedBuilder()
+                            .setColor(0xff0000)
+                            .setTitle('❌ Permisos Insuficientes')
+                            .setDescription('Solo administradores con permisos completos pueden usar esta función.')
+                            .setTimestamp();
+
+                        return await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                    }
+
+                    const warningEmbed = new EmbedBuilder()
+                        .setColor(0xff4444)
+                        .setTitle('⚠️ CONFIRMACIÓN REQUERIDA')
+                        .setDescription('**¿Estás seguro de que quieres limpiar TODOS los datos?**\n\n' +
+                            '🗑️ **Se eliminarán:**\n' +
+                            '• Todas las actividades registradas\n' +
+                            '• Todos los balances y aportes monetarios\n' +
+                            '• Todos los hilos de usuarios\n' +
+                            '• Todos los hilos de balance\n' +
+                            '• Configuraciones actuales\n\n' +
+                            '⚠️ **Esta acción NO se puede deshacer**\n\n' +
+                            'Para confirmar, usa el comando `!limpiar-todo` en el chat y sigue las instrucciones.')
+                        .setTimestamp();
+
+                    await interaction.reply({ embeds: [warningEmbed], flags: MessageFlags.Ephemeral });
+
+                } catch (error) {
+                    console.error('❌ Error en limpiar datos desde panel:', error);
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('❌ Error')
+                        .setDescription('Hubo un error al procesar la solicitud.')
+                        .setTimestamp();
+                    
+                    await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+                }
+                return;
+            }
+
+            if (interaction.customId === 'admin_crear_mensaje') {
+                try {
+                    const processingEmbed = new EmbedBuilder()
+                        .setColor(0xffa500)
+                        .setTitle('🔄 Recreando Mensajes...')
+                        .setDescription('Verificando y recreando mensajes persistentes...')
+                        .setTimestamp();
+
+                    await interaction.reply({ embeds: [processingEmbed], flags: MessageFlags.Ephemeral });
+
+                    // Recrear mensaje persistente de registro
+                    await checkPersistentMessage();
+                    
+                    // Recrear panel de administración
+                    await checkAdminPanel();
+
+                    const successEmbed = new EmbedBuilder()
+                        .setColor(0x00ff00)
+                        .setTitle('✅ Mensajes Recreados')
+                        .setDescription('Los mensajes persistentes han sido verificados y recreados si era necesario.')
+                        .setTimestamp();
+
+                    await interaction.editReply({ embeds: [successEmbed] });
+
+                } catch (error) {
+                    console.error('❌ Error recreando mensajes desde panel:', error);
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(0xff0000)
+                        .setTitle('❌ Error')
+                        .setDescription('Hubo un error al recrear los mensajes.')
+                        .setTimestamp();
+                    
+                    await interaction.editReply({ embeds: [errorEmbed] });
+                }
+                return;
+            }
         }
 
         // Manejar botones del mensaje persistente
@@ -2195,7 +2784,7 @@ client.on('interactionCreate', async interaction => {
 
             if (interaction.customId === 'persistent_aportar') {
                 try {
-                    // Crear modal para capturar monto y descripción
+                    // Crear modal para capturar solo el monto
                     const modal = new ModalBuilder()
                         .setCustomId('aportar_modal')
                         .setTitle('💰 Registrar Aporte');
@@ -2209,22 +2798,11 @@ client.on('interactionCreate', async interaction => {
                         .setRequired(true)
                         .setMaxLength(10);
 
-                    // Campo para la descripción
-                    const descripcionInput = new TextInputBuilder()
-                        .setCustomId('descripcion_input')
-                        .setLabel('Descripción del trabajo realizado')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setPlaceholder('Ej: Abastecimiento eléctrico en restaurante La Cocina')
-                        .setRequired(true)
-                        .setMinLength(5)
-                        .setMaxLength(500);
-
-                    // Crear filas para los inputs
+                    // Crear fila para el input
                     const firstActionRow = new ActionRowBuilder().addComponents(montoInput);
-                    const secondActionRow = new ActionRowBuilder().addComponents(descripcionInput);
 
-                    // Agregar los inputs al modal
-                    modal.addComponents(firstActionRow, secondActionRow);
+                    // Agregar el input al modal
+                    modal.addComponents(firstActionRow);
 
                     // Mostrar el modal
                     await interaction.showModal(modal);
