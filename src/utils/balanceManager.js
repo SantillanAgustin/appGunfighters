@@ -331,11 +331,19 @@ function shouldResetWeeklyBalances() {
         return true;
     }
     
-    // Verificar si cambió la semana
+    // Verificar si cambió la semana Y es lunes (día 1) a partir de las 00:00 UTC
     const lastResetDate = new Date(balances.lastReset);
     const lastResetWeek = getWeekKey(lastResetDate);
     
-    return currentWeek !== lastResetWeek;
+    // Solo resetear si:
+    // 1. La semana cambió
+    // 2. Es lunes (getUTCDay() === 1)
+    // 3. Es a partir de las 00:00 UTC
+    const isNewWeek = currentWeek !== lastResetWeek;
+    const isMonday = now.getUTCDay() === 1;
+    const isAfterMidnight = now.getUTCHours() >= 0; // Siempre true, pero clarifica la lógica
+    
+    return isNewWeek && isMonday && isAfterMidnight;
 }
 
 // Obtener clave de semana actual
@@ -346,15 +354,22 @@ function getCurrentWeekKey() {
 // Obtener clave de semana para una fecha específica
 function getWeekKey(date) {
     const year = date.getUTCFullYear();
-    const weekNumber = getWeekNumber(date);
+    const weekNumber = getISOWeekNumber(date);
     return `${year}-W${weekNumber.toString().padStart(2, '0')}`;
 }
 
-// Obtener número de semana
+// Función para calcular número de semana ISO 8601
+function getISOWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Obtener número de semana (función obsoleta, mantenida por compatibilidad)
 function getWeekNumber(date) {
-    const firstDayOfYear = new Date(date.getUTCFullYear(), 0, 1);
-    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getUTCDay() + 1) / 7);
+    return getISOWeekNumber(date);
 }
 
 // Actualizar configuración
@@ -437,6 +452,51 @@ function getUserBalanceThread(userId) {
     return balances.users[userId].balanceThreadId || null;
 }
 
+/**
+ * Recalcular balances basándose en las contribuciones de la semana actual
+ */
+function recalculateCurrentBalances() {
+    try {
+        const balances = loadBalances();
+        const currentWeek = getCurrentWeekKey();
+        
+        console.log(`🔄 Recalculando balances para la semana ${currentWeek}...`);
+        
+        // Para cada usuario
+        for (const userId in balances.users) {
+            const user = balances.users[userId];
+            const weeklyContributions = user.weeklyContributions[currentWeek] || [];
+            
+            // Calcular total aportado esta semana (organizationAmount)
+            const weeklyTotal = weeklyContributions.reduce((sum, contrib) => sum + contrib.organizationAmount, 0);
+            
+            // Calcular balance actual: inicial - aportado esta semana
+            const newBalance = Math.max(0, balances.settings.initialBalance - weeklyTotal);
+            
+            console.log(`👤 ${user.displayName || user.username || userId}:`);
+            console.log(`   Balance anterior: ${formatMoney(user.currentBalance)}`);
+            console.log(`   Aportado esta semana: ${formatMoney(weeklyTotal)}`);
+            console.log(`   Balance recalculado: ${formatMoney(newBalance)}`);
+            
+            // Actualizar balance
+            user.currentBalance = newBalance;
+        }
+        
+        // Guardar cambios
+        const saved = saveBalances(balances);
+        if (saved) {
+            console.log('✅ Balances recalculados y guardados exitosamente');
+        } else {
+            console.error('❌ Error guardando balances recalculados');
+        }
+        
+        return saved;
+    } catch (error) {
+        console.error('❌ Error recalculando balances:', error);
+        return false;
+    }
+}
+
 module.exports = {
     loadBalances,
     saveBalances,
@@ -452,5 +512,6 @@ module.exports = {
     clearAllBalanceData,
     formatMoney,
     saveUserBalanceThread,
-    getUserBalanceThread
+    getUserBalanceThread,
+    recalculateCurrentBalances
 };

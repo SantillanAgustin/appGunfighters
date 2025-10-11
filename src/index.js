@@ -46,7 +46,8 @@ const {
     formatMoney,
     saveUserBalanceThread,
     getUserBalanceThread,
-    clearAllBalanceData
+    clearAllBalanceData,
+    recalculateCurrentBalances
 } = require('./utils/balanceManager');
 
 // Opciones predefinidas para tipos de trabajos/encargos
@@ -575,6 +576,15 @@ async function checkWeeklyBalanceReset() {
     try {
         if (shouldResetWeeklyBalances()) {
             console.log('⏰ Es momento de resetear los balances semanales...');
+            
+            // IMPORTANTE: Verificar si se debe generar el informe semanal ANTES del reset
+            if (shouldGenerateWeeklyReport()) {
+                console.log('📊 Generando informe semanal antes del reset...');
+                await generateAndSendWeeklyReport();
+                // Esperar un momento para asegurar que el informe se envíe
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
             console.log('🔧 Variables de entorno relevantes:');
             console.log('   REPORTS_CHANNEL_ID:', process.env.REPORTS_CHANNEL_ID);
             console.log('   REMINDERS_CHANNEL_ID:', process.env.REMINDERS_CHANNEL_ID);
@@ -1086,7 +1096,7 @@ client.on('messageCreate', async message => {
         let commands = '`!help`, `!registro`, `!balance`, `!aportar`';
         
         if (canManageMessages) {
-            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!crear-panel-admin`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`, `!balances`, `!estadisticas-balance`';
+            commands += ', `!config`, `!informe`, `!crear-mensaje`, `!crear-panel-admin`, `!recordatorios`, `!agregar-actividad`, `!listar-actividades`, `!balances`, `!estadisticas-balance`, `!recalcular-balances`';
         }
         
         if (isAdmin) {
@@ -2149,6 +2159,55 @@ client.on('messageCreate', async message => {
         } catch (error) {
             console.error('❌ Error consultando estadísticas:', error);
             message.reply('❌ Error al consultar las estadísticas.');
+        }
+    }
+
+    // Comando para recalcular balances
+    if (command === 'recalcular-balances') {
+        if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            return message.reply('❌ No tienes permisos para usar este comando.');
+        }
+
+        try {
+            const loadingEmbed = new EmbedBuilder()
+                .setColor(0xffa500)
+                .setTitle('🔄 Recalculando Balances...')
+                .setDescription('Recalculando todos los balances basándose en las contribuciones de la semana actual.')
+                .setTimestamp();
+
+            const loadingMessage = await message.reply({ embeds: [loadingEmbed] });
+
+            // Ejecutar recálculo
+            const success = recalculateCurrentBalances();
+
+            if (success) {
+                const successEmbed = new EmbedBuilder()
+                    .setColor(0x00ff00)
+                    .setTitle('✅ Balances Recalculados')
+                    .setDescription('Todos los balances han sido recalculados exitosamente basándose en las contribuciones de la semana actual.')
+                    .addFields([
+                        {
+                            name: '📊 Próximo paso',
+                            value: 'Usa `!balances` o `!informe` para ver los balances actualizados.',
+                            inline: false
+                        }
+                    ])
+                    .setTimestamp();
+
+                await loadingMessage.edit({ embeds: [successEmbed] });
+            } else {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(0xff0000)
+                    .setTitle('❌ Error al Recalcular')
+                    .setDescription('Hubo un problema al recalcular los balances. Revisa la consola para más detalles.')
+                    .setTimestamp();
+
+                await loadingMessage.edit({ embeds: [errorEmbed] });
+            }
+
+        } catch (error) {
+            console.error('❌ Error recalculando balances:', error);
+            message.reply('❌ Error al recalcular los balances.');
         }
     }
 

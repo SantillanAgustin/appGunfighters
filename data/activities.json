@@ -1,39 +1,223 @@
 {
   "users": {
-    "417479946177609729": {
-      "username": "Test dev",
+    "136912799560368128": {
+      "username": "Romeo",
       "activities": {
         "2025-W41": {
           "limpieza_espacios": 1,
           "abastecimiento_electrico": 0,
           "asesoramiento_empresarial": 0,
           "jardineria": 0,
-          "mantenimiento_gasolineras": 1,
+          "mantenimiento_gasolineras": 0,
           "limpieza_rascacielos": 0,
           "history": [
             {
               "type": "limpieza_espacios",
-              "timestamp": "2025-10-05T23:42:22.043Z",
+              "timestamp": "2025-10-06T15:25:35.758Z",
               "proofImages": [
-                "https://cdn.discordapp.com/attachments/1423854299896614942/1424542269289009172/image.png?ex=68e453df&is=68e3025f&hm=c45bbff914a65d55c6174d1ab580ffd2999233e4024748d6dce4508d62fb6662&"
-              ]
-            },
-            {
-              "type": "mantenimiento_gasolineras",
-              "timestamp": "2025-10-05T23:42:35.940Z",
-              "proofImages": [
-                "https://cdn.discordapp.com/attachments/1423854299896614942/1424542327728246945/image.png?ex=68e453ed&is=68e3026d&hm=d9cbc9a011051eb0b05cd19ca18f8831b14bb403bca051ccf1c7de40f0c79628&"
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1424779632690987048/image.png?ex=68e530ef&is=68e3df6f&hm=f9dc9483bb38bbca15f4f437510fb232b01df53dcd12be015c3149e5cd37488d&"
               ]
             }
           ]
         }
       },
-      "threadId": "1424542272527138929"
+      "threadId": "1424779635102580776"
+    },
+    "417479946177609729": {
+      "username": "Tester Dev",
+      "activities": {
+        "2025-W41": {
+          "limpieza_espacios": 0,
+          "abastecimiento_electrico": 0,
+          "asesoramiento_empresarial": 0,
+          "jardineria": 1,
+          "mantenimiento_gasolineras": 0,
+          "limpieza_rascacielos": 0,
+          "history": [
+            {
+              "type": "jardineria",
+              "timestamp": "2025-10-06T16:20:22.623Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1424793418684436521/image.png?ex=68e53dc6&is=68e3ec46&hm=1e3aa34d6c44e51bdd493ab59e25a5435a9b9eba88735e1cfc5edbc1343652fe&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1424793421394088087"
+    },
+    "655922270946197533": {
+      "username": "Junior",
+      "activities": {
+        "2025-W41": {
+          "limpieza_espacios": 2,
+          "abastecimiento_electrico": 5,
+          "asesoramiento_empresarial": 1,
+          "jardineria": 0,
+          "mantenimiento_gasolineras": 0,
+          "limpieza_rascacielos": 2,
+          "history": [
+            {
+              "type": "asesoramiento_empresarial",
+              "timestamp": "2025-10-07T01:18:22.207Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1424928808531923005/image.png?ex=68e5bbdd&is=68e46a5d&hm=20d83ff9477a70550e6fef3ff7cb238bcf1206cfab07cb50b1ccba542b11185b&"
+              ]
+            },
+            {
+              "type": "limpieza_espacios",
+              "timestamp": "2025-10-07T06:11:08.596Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425002487953489993/image.png?ex=68e6007c&is=68e4aefc&hm=3ec1e421468f558f2ab53d0b475baede5955746c5d823a64423be56ea5e3827a&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-10-07T18:31:46.427Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425188873348055060/image.png?ex=68e6ae12&is=68e55c92&hm=fa71d5ebb57ce314129d5076351f4357f0b2fc23d7b5ae9542d40e8ce4e228d4&"
+              ]
+            },
+            {
+              "type": "limpieza_rascacielos",
+              "timestamp": "2025-10-07T19:14:06.347Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425199526066655312/image.png?ex=68e6b7fd&is=68e5667d&hm=b3ddf94aabb75d8f79bcbf5afedbb1a69b022d8e1d58fdba577d81ecfc7d763c&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-10-07T21:04:59.438Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425227431786057768/image.png?ex=68e6d1fb&is=68e5807b&hm=d322215462da091a8e659c6f9192924f3e4a3a0e0143cff2d15213663a3dd23f&"
+              ]
+            },
+            {
+              "type": "limpieza_espacios",
+              "timestamp": "2025-10-07T22:12:55.279Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425244527366635570/image.png?ex=68e6e1e7&is=68e59067&hm=4a51085447782ff948b1d70648504c0bb1bc8b35e05ca87e6a8a4d5fc8415c88&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-10-08T16:29:28.696Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425520484379918376/image.png?ex=68e7e2e8&is=68e69168&hm=0c8aca7bb5790ee35063982b744980a671961e2119c3373e74d9324189cc71b7&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-10-08T18:32:29.285Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425551440310698096/image.png?ex=68e7ffbc&is=68e6ae3c&hm=783d62d20f03a1999a12c8d14a627aacf7f26c9657c492f4fb6844ead47bff8c&"
+              ]
+            },
+            {
+              "type": "limpieza_rascacielos",
+              "timestamp": "2025-10-08T19:18:06.402Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425562921316126802/image.png?ex=68e80a6e&is=68e6b8ee&hm=f5a571732d5a47f97952ecdb8745c12f26f6c1dda3462546e7e812e24e8e8058&"
+              ]
+            },
+            {
+              "type": "abastecimiento_electrico",
+              "timestamp": "2025-10-08T21:46:36.717Z",
+              "proofImages": [
+                "https://cdn.discordapp.com/attachments/1423854299896614942/1425600294359662735/image.png?ex=68e82d3c&is=68e6dbbc&hm=f0c73c939829ef56829ccdc0e57a9dd09588bb5920de5de334ae42b1c3e8c406&"
+              ]
+            }
+          ]
+        }
+      },
+      "threadId": "1424928810817818697"
     }
   },
-  "weeklyReports": {},
+  "weeklyReports": {
+    "2025-W41": {
+      "week": "2025-W41",
+      "totalUsers": 3,
+      "totalActivities": 12,
+      "activityStats": {
+        "limpieza_espacios": 3,
+        "abastecimiento_electrico": 5,
+        "asesoramiento_empresarial": 1,
+        "jardineria": 1,
+        "mantenimiento_gasolineras": 0,
+        "limpieza_rascacielos": 2
+      },
+      "userStats": [
+        {
+          "userId": "655922270946197533",
+          "username": "Junior",
+          "totalActivities": 10,
+          "activities": {
+            "limpieza_espacios": 3,
+            "abastecimiento_electrico": 5,
+            "asesoramiento_empresarial": 1,
+            "jardineria": 1,
+            "mantenimiento_gasolineras": 0,
+            "limpieza_rascacielos": 2
+          },
+          "balance": {
+            "currentBalance": 0,
+            "weeklyContributed": 57638,
+            "contributionsCount": 36,
+            "quotaCompleted": true
+          }
+        },
+        {
+          "userId": "136912799560368128",
+          "username": "Romeo",
+          "totalActivities": 1,
+          "activities": {
+            "limpieza_espacios": 1,
+            "abastecimiento_electrico": 0,
+            "asesoramiento_empresarial": 0,
+            "jardineria": 0,
+            "mantenimiento_gasolineras": 0,
+            "limpieza_rascacielos": 0
+          },
+          "balance": {
+            "currentBalance": 49500,
+            "weeklyContributed": 500,
+            "contributionsCount": 1,
+            "quotaCompleted": false
+          }
+        },
+        {
+          "userId": "417479946177609729",
+          "username": "Tester Dev",
+          "totalActivities": 1,
+          "activities": {
+            "limpieza_espacios": 1,
+            "abastecimiento_electrico": 0,
+            "asesoramiento_empresarial": 0,
+            "jardineria": 1,
+            "mantenimiento_gasolineras": 0,
+            "limpieza_rascacielos": 0
+          },
+          "balance": {
+            "currentBalance": 44950,
+            "weeklyContributed": 5050,
+            "contributionsCount": 2,
+            "quotaCompleted": false
+          }
+        }
+      ],
+      "balanceStats": {
+        "totalContributions": 130379,
+        "totalOrganizationAmount": 65188,
+        "activeMembers": 4,
+        "contributionsCount": 40,
+        "completedQuotas": 1,
+        "pendingQuotas": 4
+      },
+      "generatedAt": "2025-10-10T03:40:01.094Z"
+    }
+  },
   "currentWeek": "2025-W41",
   "pendingRegistrations": {},
-  "persistentMessageId": "1424523078104252418",
+  "persistentMessageId": "1424781350983958680",
   "pendingAportes": {}
 }

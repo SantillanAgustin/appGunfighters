@@ -85,10 +85,18 @@ function saveData(data) {
  */
 function getCurrentWeek() {
     const date = new Date();
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-    const weekNumber = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    return `${date.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
+    const year = date.getUTCFullYear();
+    const weekNumber = getISOWeekNumber(date);
+    return `${year}-W${weekNumber.toString().padStart(2, '0')}`;
+}
+
+// Función para calcular número de semana ISO 8601
+function getISOWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
 /**
@@ -501,8 +509,8 @@ function shouldGenerateWeeklyReport() {
     const now = new Date();
     const data = loadData();
     
-    // Verificar si es domingo entre 23:59 y 00:00 UTC
-    const isDayToGenerate = now.getUTCDay() === 0 && now.getUTCHours() === 23 && now.getUTCMinutes() >= 59;
+    // Verificar si es domingo a partir de las 23:58 UTC (para dar margen)
+    const isDayToGenerate = now.getUTCDay() === 0 && now.getUTCHours() === 23 && now.getUTCMinutes() >= 58;
     
     // Verificar si ya se generó esta semana
     const currentWeek = getCurrentWeek();

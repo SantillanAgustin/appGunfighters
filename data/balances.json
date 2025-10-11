@@ -1,38 +1,472 @@
 {
   "users": {
-    "417479946177609729": {
-      "currentBalance": 20000,
+    "655922270946197533": {
+      "currentBalance": 50000,
       "weeklyContributions": {
         "2025-W41": [
           {
-            "id": "1759707810042",
-            "totalAmount": 60000,
-            "organizationAmount": 30000,
-            "memberAmount": 30000,
-            "description": "Limpieza de mall",
-            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424542554510065694/image.png?ex=68e45423&is=68e302a3&hm=c1ffa8071c3aedaa3e90bed17b7e092a71ddb515521d6abbc39110978ce1862e&",
-            "timestamp": "2025-10-05T23:43:30.042Z",
+            "id": "1759800994018",
+            "totalAmount": 3000,
+            "organizationAmount": 1500,
+            "memberAmount": 1500,
+            "description": "limpieza delgada.",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424933388493656146/image.png?ex=68e5c021&is=68e46ea1&hm=d7d4843d6c8807433293ee3e8370418461265f173ede56d42bba47dd157e3ce1&",
+            "timestamp": "2025-10-07T01:36:34.018Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759801183463",
+            "totalAmount": 4500,
+            "organizationAmount": 2250,
+            "memberAmount": 2250,
+            "description": "mantenimiento de sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424934183280840715/image.png?ex=68e5c0df&is=68e46f5f&hm=a7719aaf4744014fb1533a15966218d20c9e6ed2070b0f13bb9537069ee864e9&",
+            "timestamp": "2025-10-07T01:39:43.463Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759801512848",
+            "totalAmount": 3700,
+            "organizationAmount": 1850,
+            "memberAmount": 1850,
+            "description": "Mantenimiento de sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424935563194007573/image.png?ex=68e5c228&is=68e470a8&hm=f58e4357901f199ab7e3d9a3fd6373b8c97a4dd9e99ea8e188b665e69bd3ca50&",
+            "timestamp": "2025-10-07T01:45:12.848Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759801874895",
+            "totalAmount": 2222,
+            "organizationAmount": 1111,
+            "memberAmount": 1111,
+            "description": "Limpieza delgada",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424937083075563540/image.png?ex=68e5c392&is=68e47212&hm=85bd3f0aaa101029ad838d1f0383f931b520a98261b343fdc6eb14218df08b3a&",
+            "timestamp": "2025-10-07T01:51:14.895Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759801933438",
+            "totalAmount": 2222,
+            "organizationAmount": 1111,
+            "memberAmount": 1111,
+            "description": "Limpieza delgada",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424937328614576231/image.png?ex=68e5c3cd&is=68e4724d&hm=41bd3c8cb9af1d85f0c3f177cd15d65c9ebe9e8f4291ec780a87999ecdb801fc&",
+            "timestamp": "2025-10-07T01:52:13.438Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759802569759",
+            "totalAmount": 3400,
+            "organizationAmount": 1700,
+            "memberAmount": 1700,
+            "description": "Limpieza delgada",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424939996506361887/image.png?ex=68e5c649&is=68e474c9&hm=2a4c46a6e6a8d593f2cdbfe2976fd8ff62b0c86bb513f273e072443d8af83d0b&",
+            "timestamp": "2025-10-07T02:02:49.759Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759802782891",
+            "totalAmount": 3200,
+            "organizationAmount": 1600,
+            "memberAmount": 1600,
+            "description": "Mantenimiento en sistema",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424940891667435601/image.png?ex=68e5c71e&is=68e4759e&hm=f5bd3524b1120d483283724ea96b32f7458d091f052a420e3aa385e603572f99&",
+            "timestamp": "2025-10-07T02:06:22.891Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759815495690",
+            "totalAmount": 4000,
+            "organizationAmount": 2000,
+            "memberAmount": 2000,
+            "description": "mantenimiento de sistema",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424994212688035991/image.png?ex=68e5f8c7&is=68e4a747&hm=f8eea91f94f9665a9ac435bb909696ddc5f6e56528b5651ff81beb74b7b87e03&",
+            "timestamp": "2025-10-07T05:38:15.690Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759815992754",
+            "totalAmount": 3000,
+            "organizationAmount": 1500,
+            "memberAmount": 1500,
+            "description": "mantenimiento electrico",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424996297664102481/image.png?ex=68e5fab8&is=68e4a938&hm=af8886ab87365e96807c9ecbf4c5d79a121536f838e72940216467d98d00e888&",
+            "timestamp": "2025-10-07T05:46:32.754Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759816120069",
+            "totalAmount": 2600,
+            "organizationAmount": 1300,
+            "memberAmount": 1300,
+            "description": "mantenimiento electrico",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424996831666110504/image.png?ex=68e5fb37&is=68e4a9b7&hm=0df5af1d15e52f0e24d3ff09a3ee18220d8e61e2b08bbebfe280eb076ab9e417&",
+            "timestamp": "2025-10-07T05:48:40.069Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759816306660",
+            "totalAmount": 2810,
+            "organizationAmount": 1405,
+            "memberAmount": 1405,
+            "description": "mantenimiento electrico",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424997613983236146/image.png?ex=68e5fbf2&is=68e4aa72&hm=9ae955f0ea8b1ed1e4a2d593d6cb93c69a45829a8d2c7ad989315ed594d49c6e&",
+            "timestamp": "2025-10-07T05:51:46.660Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759816561745",
+            "totalAmount": 2222,
+            "organizationAmount": 1111,
+            "memberAmount": 1111,
+            "description": "mantenimiento de sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424998683551731813/image.png?ex=68e5fcf1&is=68e4ab71&hm=fe594d368c49de7217e918b8c7d2974c8ce3290470d81b1ad00e5c31610ef9fc&",
+            "timestamp": "2025-10-07T05:56:01.745Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759816915516",
+            "totalAmount": 3000,
+            "organizationAmount": 1500,
+            "memberAmount": 1500,
+            "description": "mantenimiento sistema",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425000167937019934/image.png?ex=68e5fe53&is=68e4acd3&hm=7c5fc8647f6b60920e890b07e46af68b4e70e7d85adf30f22a1b644362210488&",
+            "timestamp": "2025-10-07T06:01:55.516Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759818874719",
+            "totalAmount": 2200,
+            "organizationAmount": 1100,
+            "memberAmount": 1100,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425008385438519388/image.png?ex=68e605fa&is=68e4b47a&hm=e4c84d2f9a60fdf39c71ab306446c180d5d6ceb676835def974736e1884d043b&",
+            "timestamp": "2025-10-07T06:34:34.719Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759819077965",
+            "totalAmount": 3500,
+            "organizationAmount": 1750,
+            "memberAmount": 1750,
+            "description": "mantenimiento sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425009238018621550/image.png?ex=68e606c5&is=68e4b545&hm=dc763075f968b2096c59804c94b1bd3c8cdd32af975edba7e043e6700fef4fa3&",
+            "timestamp": "2025-10-07T06:37:57.965Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759819269454",
+            "totalAmount": 2200,
+            "organizationAmount": 1100,
+            "memberAmount": 1100,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425010040934236170/image.png?ex=68e60785&is=68e4b605&hm=d4ff267372a98b061eba9e37836bce68a0a4c7bb11f11e71cbc7b3828035c56a&",
+            "timestamp": "2025-10-07T06:41:09.454Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759819470781",
+            "totalAmount": 2200,
+            "organizationAmount": 1100,
+            "memberAmount": 1100,
+            "description": "mantenimiento sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425010885675450399/image.png?ex=68e6084e&is=68e4b6ce&hm=201ee7b5a19633b5a7ecff3661348a7187ed2220c6955d9383c3447ffb2218c4&",
+            "timestamp": "2025-10-07T06:44:30.781Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759819816959",
+            "totalAmount": 1250,
+            "organizationAmount": 625,
+            "memberAmount": 625,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425012337156296719/image.png?ex=68e609a8&is=68e4b828&hm=a79f8a5fda174bc8bed017ede3cb51c23c65354196698bfbd39e79bad37b3785&",
+            "timestamp": "2025-10-07T06:50:16.959Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759819939319",
+            "totalAmount": 2000,
+            "organizationAmount": 1000,
+            "memberAmount": 1000,
+            "description": "mantenimiento sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425012850585243668/image.png?ex=68e60a23&is=68e4b8a3&hm=4e8ac7c7600ebefe9176266979f3c9cb48b2a07243a638e6e7d2860722eb0be4&",
+            "timestamp": "2025-10-07T06:52:19.319Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759820364377",
+            "totalAmount": 2000,
+            "organizationAmount": 1000,
+            "memberAmount": 1000,
+            "description": "fumigacion",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425014633437073418/image.png?ex=68e60bcc&is=68e4ba4c&hm=e9848bd52fb90c5349196d2014e4b962cfe06e9b1d73637f45b3533c995d50e7&",
+            "timestamp": "2025-10-07T06:59:24.377Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759820460205",
+            "totalAmount": 2000,
+            "organizationAmount": 1000,
+            "memberAmount": 1000,
+            "description": "fumigacion",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425015035432013896/image.png?ex=68e60c2b&is=68e4baab&hm=5e5b5a61c0d271ce96cd8ab637890b17aacc9c7b5e4c6a24c3cb2c0d8ace71eb&",
+            "timestamp": "2025-10-07T07:01:00.205Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759820870398",
+            "totalAmount": 4500,
+            "organizationAmount": 2250,
+            "memberAmount": 2250,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425016755696308234/image.png?ex=68e60dc6&is=68e4bc46&hm=de492a8772df23479ad6a746eec5348468d520d9c9ebf06088f1776d722d9b85&",
+            "timestamp": "2025-10-07T07:07:50.398Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759821476915",
+            "totalAmount": 2600,
+            "organizationAmount": 1300,
+            "memberAmount": 1300,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425019299965440111/image.png?ex=68e61024&is=68e4bea4&hm=c4a5b919348673ae334879fc9cb1da4b428dad227a1b54a6ee96822a2fcd6a51&",
+            "timestamp": "2025-10-07T07:17:56.915Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759821504346",
+            "totalAmount": 2600,
+            "organizationAmount": 1300,
+            "memberAmount": 1300,
+            "description": "limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425019415103017063/image.png?ex=68e61040&is=68e4bec0&hm=dbcc5a1826355e01bc7e2e59b6ad76564803f8c1ad222b37be84b7828bf3af5d&",
+            "timestamp": "2025-10-07T07:18:24.346Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759822526613",
+            "totalAmount": 3000,
+            "organizationAmount": 1500,
+            "memberAmount": 1500,
+            "description": "sistemas mantenimiento",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425023702130753617/image.png?ex=68e6143e&is=68e4c2be&hm=0a8b63b630f4fcf8371c281215c7ee09a174e1effc5aceb4becbe0d9b5a462f9&",
+            "timestamp": "2025-10-07T07:35:26.613Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759853639999",
+            "totalAmount": 6000,
+            "organizationAmount": 3000,
+            "memberAmount": 3000,
+            "description": "LIMPIEZA",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425154200886710404/image.png?ex=68e68dc7&is=68e53c47&hm=cffad149d6a027b116eec47463e6673fd3e36eff9aa2e3c09a47737a65012fc0&",
+            "timestamp": "2025-10-07T16:13:59.999Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759854557273",
+            "totalAmount": 5100,
+            "organizationAmount": 2550,
+            "memberAmount": 2550,
+            "description": "LIMPIEZA",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425158048980406454/image.png?ex=68e6915d&is=68e53fdd&hm=7b5b7aa0f89d5a5c404e53a1fd4a1982f19d62a83f277533e407b87d7725351d&",
+            "timestamp": "2025-10-07T16:29:17.273Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759855416633",
+            "totalAmount": 4010,
+            "organizationAmount": 2005,
+            "memberAmount": 2005,
+            "description": "LIMPIEZA",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425161653627916309/image.png?ex=68e694b8&is=68e54338&hm=a65d253558bb9afb05329f216184273e5cb05b5c6dc82c42517438b7e052ebdb&",
+            "timestamp": "2025-10-07T16:43:36.633Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759856365841",
+            "totalAmount": 5100,
+            "organizationAmount": 2550,
+            "memberAmount": 2550,
+            "description": "sistemas",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425165634718793859/image.png?ex=68e6986d&is=68e546ed&hm=7e5ac50c48981f41288399f25a51588c73a15abc0cdcee87af1fcf9752352525&",
+            "timestamp": "2025-10-07T16:59:25.841Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759905501985",
+            "totalAmount": 3333,
+            "organizationAmount": 1666,
+            "memberAmount": 1667,
+            "description": "Limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425371726556041216/image.png?ex=68e7585d&is=68e606dd&hm=187632b488123dddfd4b48468ae226b748b4efc6948d4590dbf070d650a4feb3&",
+            "timestamp": "2025-10-08T06:38:21.985Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759905543869",
+            "totalAmount": 3333,
+            "organizationAmount": 1666,
+            "memberAmount": 1667,
+            "description": "Limpieza 2",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425371902066688070/image.png?ex=68e75887&is=68e60707&hm=9129a33c31b759e22beb6209ef9a439ff4a20a0771b8f701f4c415ccb7b7152b&",
+            "timestamp": "2025-10-08T06:39:03.869Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759932986068",
+            "totalAmount": 2222,
+            "organizationAmount": 1111,
+            "memberAmount": 1111,
+            "description": "Limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425487002761035877/image.png?ex=68e7c3b9&is=68e67239&hm=9f8f9653b66703b559b10a4c789ef8e8d60f2d5938cfd8efcec8017353bfa061&",
+            "timestamp": "2025-10-08T14:16:26.068Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759933027216",
+            "totalAmount": 2222,
+            "organizationAmount": 1111,
+            "memberAmount": 1111,
+            "description": "Limpieza",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425487175654314074/image.png?ex=68e7c3e2&is=68e67262&hm=c1c593499ae2aaef0bfe3c3a951a6465630b4698431c3b549828a7c47b063dc1&",
+            "timestamp": "2025-10-08T14:17:07.216Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759941700876",
+            "totalAmount": 5500,
+            "organizationAmount": 2750,
+            "memberAmount": 2750,
+            "description": "Instalación, reparación y mantenimiento eléctrico",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425523555658891447/image.png?ex=68e7e5c4&is=68e69444&hm=3a914dd8ae2fac1648cdd6d71af41f00c62bd1b14e4b3b90f1f726657d76160d&",
+            "timestamp": "2025-10-08T16:41:40.876Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759943247925",
+            "totalAmount": 5200,
+            "organizationAmount": 2600,
+            "memberAmount": 2600,
+            "description": "Servicios de limpieza y mantenimiento de espacios",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425530044444446924/image.png?ex=68e7ebcf&is=68e69a4f&hm=9e29860246c043865c1d668c98ed68cd6202ba0f0104917a2e7c80486b08dc47&",
+            "timestamp": "2025-10-08T17:07:27.925Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1760042867310",
+            "totalAmount": 3333,
+            "organizationAmount": 1666,
+            "memberAmount": 1667,
+            "description": "Servicios de limpieza y mantenimiento de espacios",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425947878458785963/image.png?ex=68e970f3&is=68e81f73&hm=dd0914b24d435959c29c457fed8f405584e44aa4437e933c1876a7c8c4f1ba6f&",
+            "timestamp": "2025-10-09T20:47:47.310Z",
             "week": "2025-W41"
           }
         ]
       },
-      "totalContributed": 30000,
-      "lastActivity": "2025-10-05T23:43:30.042Z",
+      "totalContributed": 57638,
+      "lastActivity": "2025-10-09T20:47:47.310Z",
+      "username": "jonathoek",
+      "displayName": "Junior",
+      "balanceThreadId": "1424933391165558837"
+    },
+    "417479946177609729": {
+      "currentBalance": 50000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "1759767713199",
+            "totalAmount": 10000,
+            "organizationAmount": 5000,
+            "memberAmount": 5000,
+            "description": "Limpieza de mall",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424793798818529393/image.png?ex=68e53e21&is=68e3eca1&hm=3102f9d27fefdf78b907cb0859d2af5867cc2fbea164ac509f282010069f4eaf&",
+            "timestamp": "2025-10-06T16:21:53.199Z",
+            "week": "2025-W41"
+          },
+          {
+            "id": "1759938469483",
+            "totalAmount": 100,
+            "organizationAmount": 50,
+            "memberAmount": 50,
+            "description": "Mantenimiento preventivo y correctivo de instalaciones",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425510001757261874/image.png?ex=68e7d925&is=68e687a5&hm=ae99485e65d62873171e26d2c0beba28dc432796f7fa7b22748c35970edf0d85&",
+            "timestamp": "2025-10-08T15:47:49.483Z",
+            "week": "2025-W41"
+          }
+        ]
+      },
+      "totalContributed": 5050,
+      "lastActivity": "2025-10-08T15:47:49.483Z",
       "username": "naranjuwu",
-      "displayName": "Test dev",
-      "balanceThreadId": "1424542558054387774"
+      "displayName": "Tester Dev",
+      "balanceThreadId": "1424793803004313681"
+    },
+    "136912799560368128": {
+      "currentBalance": 50000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "1759764421351",
+            "totalAmount": 1000,
+            "organizationAmount": 500,
+            "memberAmount": 500,
+            "description": "Limpieza de inmueble.",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1424779991211573388/image.png?ex=68e53145&is=68e3dfc5&hm=1a4ab691f040ecca3da6302f6c01bfb1ffa46c04c7fed6a3d20a5f2e2cd60c55&",
+            "timestamp": "2025-10-06T15:27:01.351Z",
+            "week": "2025-W41"
+          }
+        ]
+      },
+      "totalContributed": 500,
+      "lastActivity": "2025-10-06T15:27:01.351Z",
+      "username": "felixelnoob",
+      "displayName": "Romeo",
+      "balanceThreadId": "1424779994147590294"
+    },
+    "559265874834620416": {
+      "currentBalance": 50000,
+      "weeklyContributions": {
+        "2025-W41": []
+      },
+      "totalContributed": 0,
+      "lastActivity": "2025-10-07T06:37:51.909Z"
+    },
+    "555206335273107468": {
+      "currentBalance": 50000,
+      "weeklyContributions": {
+        "2025-W41": [
+          {
+            "id": "1759820137252",
+            "totalAmount": 4000,
+            "organizationAmount": 2000,
+            "memberAmount": 2000,
+            "description": "Limpieza delagada",
+            "photoUrl": "https://cdn.discordapp.com/attachments/1423854299896614942/1425013680797646948/lhqgWXF.png?ex=68e60ae8&is=68e4b968&hm=8b2d73448252cc39fdf8135574bc70ebe4fb526031d7844e0af06365c5e21e88&",
+            "timestamp": "2025-10-07T06:55:37.252Z",
+            "week": "2025-W41"
+          }
+        ]
+      },
+      "totalContributed": 2000,
+      "lastActivity": "2025-10-07T06:55:37.252Z",
+      "username": "rudyard.",
+      "displayName": "Pirlo",
+      "balanceThreadId": "1425013683658031174"
     }
   },
   "weeklyStats": {
     "2025-W41": {
-      "totalContributions": 60000,
-      "totalOrganizationAmount": 30000,
-      "totalMemberAmount": 30000,
-      "activeMembers": 1,
-      "contributionsCount": 1
+      "totalContributions": 130379,
+      "totalOrganizationAmount": 65188,
+      "totalMemberAmount": 65191,
+      "activeMembers": 4,
+      "contributionsCount": 40
     }
   },
-  "lastReset": "2025-10-05T23:05:15.167Z",
+  "lastReset": "2025-10-06T00:00:00.000Z",
   "settings": {
     "initialBalance": 50000,
     "organizationPercentage": 50
